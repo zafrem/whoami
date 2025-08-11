@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database (same as production)
+  database:
+    image: postgres:14-alpine
+    container_name: personality-survey-db-dev
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: personality_survey_dev
+      POSTGRES_USER: survey_user
+      POSTGRES_PASSWORD: dev_password
+    volumes:
+      - postgres_dev_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    networks:
+      - survey-dev-network
+
+  # Backend Development Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: personality-survey-api-dev
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      JWT_SECRET: dev_jwt_secret_key_for_development_only
+      JWT_EXPIRE: 7d
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_NAME: personality_survey_dev
+      DB_USER: survey_user
+      DB_PASSWORD: dev_password
+      CORS_ORIGIN: http://localhost:8080
+      RATE_LIMIT_WINDOW_MS: 900000
+      RATE_LIMIT_MAX: 1000
+    ports:
+      - "3001:3000"
+    depends_on:
+      - database
+    networks:
+      - survey-dev-network
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - ./backend/surveys:/app/surveys
+    command: npm run dev
+
+  # Frontend Development Server
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: personality-survey-web-dev
+    restart: unless-stopped
+    environment:
+      VITE_API_BASE_URL: http://localhost:3001/api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    networks:
+      - survey-dev-network
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host
+
+volumes:
+  postgres_dev_data:
+    driver: local
+
+networks:
+  survey-dev-network:
+    driver: bridge

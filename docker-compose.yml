@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  database:
+    image: postgres:14-alpine
+    container_name: personality-survey-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: personality_survey
+      POSTGRES_USER: survey_user
+      POSTGRES_PASSWORD: survey_password
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backend/scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - survey-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U survey_user -d personality_survey"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API Server
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: personality-survey-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      JWT_SECRET: ${JWT_SECRET:-your_super_secret_jwt_key_change_this_in_production}
+      JWT_EXPIRE: 7d
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_NAME: personality_survey
+      DB_USER: survey_user
+      DB_PASSWORD: survey_password
+      CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
+      RATE_LIMIT_WINDOW_MS: 900000
+      RATE_LIMIT_MAX: 100
+    ports:
+      - "3000:3000"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - survey-network
+    volumes:
+      - ./backend/surveys:/app/surveys:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Frontend Web Server
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3000/api}
+    container_name: personality-survey-web
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+    networks:
+      - survey-network
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  survey-network:
+    driver: bridge

@@ -1,0 +1,239 @@
+{
+  "name": {
+    "en": "Myers-Briggs Type Indicator (MBTI)",
+    "ko": "마이어스-브릭스 성격 유형 지표 (MBTI)"
+  },
+  "description": {
+    "en": "Discover your personality type based on psychological preferences in how people perceive the world and make decisions.",
+    "ko": "사람들이 세상을 인식하고 결정을 내리는 방식에 대한 심리적 선호도를 바탕으로 성격 유형을 발견해보세요."
+  },
+  "category": "personality",
+  "language": "en",
+  "baseId": "mbti",
+  "estimatedTime": 15,
+  "difficulty": "medium",
+  "tags": ["personality", "psychology", "myers-briggs"],
+  "questions": [
+    {
+      "id": "q1",
+      "text": "You find it easy to introduce yourself to other people",
+      "type": "scale",
+      "dimension": "EI",
+      "options": [
+        { "value": 0, "text": "Strongly Disagree" },
+        { "value": 1, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 3, "text": "Agree" },
+        { "value": 4, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "You often get so lost in thoughts that you ignore or forget your surroundings",
+      "type": "scale",
+      "dimension": "SN",
+      "options": [
+        { "value": 0, "text": "Strongly Disagree" },
+        { "value": 1, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 3, "text": "Agree" },
+        { "value": 4, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "You try to respond to your e-mails as soon as possible and cannot stand a messy inbox",
+      "type": "scale",
+      "dimension": "TF",
+      "options": [
+        { "value": 0, "text": "Strongly Disagree" },
+        { "value": 1, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 3, "text": "Agree" },
+        { "value": 4, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "You find it easy to stay relaxed and focused even when there is some pressure",
+      "type": "scale",
+      "dimension": "JP",
+      "options": [
+        { "value": 0, "text": "Strongly Disagree" },
+        { "value": 1, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 3, "text": "Agree" },
+        { "value": 4, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "You rarely do something just out of sheer curiosity",
+      "type": "scale",
+      "dimension": "SN",
+      "options": [
+        { "value": 4, "text": "Strongly Disagree" },
+        { "value": 3, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 1, "text": "Agree" },
+        { "value": 0, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "You feel superior to other people",
+      "type": "scale",
+      "dimension": "TF",
+      "options": [
+        { "value": 4, "text": "Strongly Disagree" },
+        { "value": 3, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 1, "text": "Agree" },
+        { "value": 0, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q7",
+      "text": "Being organized is more important to you than being adaptable",
+      "type": "scale",
+      "dimension": "JP",
+      "options": [
+        { "value": 0, "text": "Strongly Disagree" },
+        { "value": 1, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 3, "text": "Agree" },
+        { "value": 4, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q8",
+      "text": "You are usually highly motivated and energetic",
+      "type": "scale",
+      "dimension": "EI",
+      "options": [
+        { "value": 0, "text": "Strongly Disagree" },
+        { "value": 1, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 3, "text": "Agree" },
+        { "value": 4, "text": "Strongly Agree" }
+      ]
+    }
+  ],
+  "analysis": {
+    "dimensions": [
+      {
+        "key": "EI",
+        "name": "Extraversion vs Introversion",
+        "questions": ["q1", "q8"],
+        "scoring": {
+          "0": 0, "1": 25, "2": 50, "3": 75, "4": 100
+        }
+      },
+      {
+        "key": "SN",
+        "name": "Sensing vs Intuition",
+        "questions": ["q2", "q5"],
+        "scoring": {
+          "0": 0, "1": 25, "2": 50, "3": 75, "4": 100
+        }
+      },
+      {
+        "key": "TF",
+        "name": "Thinking vs Feeling",
+        "questions": ["q3", "q6"],
+        "scoring": {
+          "0": 0, "1": 25, "2": 50, "3": 75, "4": 100
+        }
+      },
+      {
+        "key": "JP",
+        "name": "Judging vs Perceiving",
+        "questions": ["q4", "q7"],
+        "scoring": {
+          "0": 0, "1": 25, "2": 50, "3": 75, "4": 100
+        }
+      }
+    ],
+    "resultTypes": [
+      {
+        "dimension": "EI",
+        "categories": [
+          {
+            "key": "I",
+            "min": 0,
+            "max": 49,
+            "description": "Introversion: You prefer to focus on your inner world and get energy from quiet reflection.",
+            "traits": ["reflective", "reserved", "deep", "private"]
+          },
+          {
+            "key": "E",
+            "min": 50,
+            "max": 100,
+            "description": "Extraversion: You prefer to focus on the outer world and get energy from interaction.",
+            "traits": ["outgoing", "social", "expressive", "active"]
+          }
+        ]
+      },
+      {
+        "dimension": "SN",
+        "categories": [
+          {
+            "key": "S",
+            "min": 0,
+            "max": 49,
+            "description": "Sensing: You prefer to focus on concrete information and practical applications.",
+            "traits": ["practical", "realistic", "observant", "detailed"]
+          },
+          {
+            "key": "N",
+            "min": 50,
+            "max": 100,
+            "description": "Intuition: You prefer to focus on patterns, possibilities, and future potential.",
+            "traits": ["imaginative", "theoretical", "abstract", "innovative"]
+          }
+        ]
+      },
+      {
+        "dimension": "TF",
+        "categories": [
+          {
+            "key": "T",
+            "min": 0,
+            "max": 49,
+            "description": "Thinking: You prefer to make decisions based on logic and objective analysis.",
+            "traits": ["analytical", "logical", "objective", "fair"]
+          },
+          {
+            "key": "F",
+            "min": 50,
+            "max": 100,
+            "description": "Feeling: You prefer to make decisions based on personal values and impact on people.",
+            "traits": ["empathetic", "compassionate", "personal", "harmonious"]
+          }
+        ]
+      },
+      {
+        "dimension": "JP",
+        "categories": [
+          {
+            "key": "J",
+            "min": 50,
+            "max": 100,
+            "description": "Judging: You prefer structure, organization, and having things settled.",
+            "traits": ["organized", "decisive", "planned", "structured"]
+          },
+          {
+            "key": "P",
+            "min": 0,
+            "max": 49,
+            "description": "Perceiving: You prefer flexibility, spontaneity, and keeping options open.",
+            "traits": ["flexible", "adaptable", "spontaneous", "open-ended"]
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "text": "Your MBTI type is {EI}{SN}{TF}{JP}. This represents your preferences in how you direct your energy, take in information, make decisions, and approach the outside world."
+    }
+  }
+}

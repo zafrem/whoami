@@ -1,0 +1,159 @@
+{
+  "name": {
+    "en": "Political Compass",
+    "ko": "정치 성향 나침반"
+  },
+  "description": {
+    "en": "Discover your political orientation on both economic and social axes.",
+    "ko": "경제적, 사회적 축에서의 당신의 정치적 성향을 발견해보세요."
+  },
+  "category": "political",
+  "language": "ko",
+  "baseId": "political-compass",
+  "estimatedTime": 10,
+  "difficulty": "easy",
+  "tags": ["정치", "이념", "경제", "사회"],
+  "questions": [
+    {
+      "id": "q1",
+      "text": "일당제 국가의 중요한 장점은 민주적 정치 시스템에서 진보를 지연시키는 모든 논쟁을 피할 수 있다는 것이다",
+      "type": "scale",
+      "dimension": "social",
+      "options": [
+        { "value": 4, "text": "매우 그렇지 않다" },
+        { "value": 3, "text": "그렇지 않다" },
+        { "value": 2, "text": "보통이다" },
+        { "value": 1, "text": "그렇다" },
+        { "value": 0, "text": "매우 그렇다" }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "시장이 자유로울수록 사람들도 더 자유롭다",
+      "type": "scale",
+      "dimension": "economic",
+      "options": [
+        { "value": 0, "text": "매우 그렇지 않다" },
+        { "value": 1, "text": "그렇지 않다" },
+        { "value": 2, "text": "보통이다" },
+        { "value": 3, "text": "그렇다" },
+        { "value": 4, "text": "매우 그렇다" }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "사형은 가장 심각한 범죄에 대한 선택사항이어야 한다",
+      "type": "scale",
+      "dimension": "social",
+      "options": [
+        { "value": 4, "text": "매우 그렇지 않다" },
+        { "value": 3, "text": "그렇지 않다" },
+        { "value": 2, "text": "보통이다" },
+        { "value": 1, "text": "그렇다" },
+        { "value": 0, "text": "매우 그렇다" }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "진정한 자유시장은 포식적인 다국적기업이 독점을 만드는 능력에 대한 제한을 필요로 한다",
+      "type": "scale",
+      "dimension": "economic",
+      "options": [
+        { "value": 4, "text": "매우 그렇지 않다" },
+        { "value": 3, "text": "그렇지 않다" },
+        { "value": 2, "text": "보통이다" },
+        { "value": 1, "text": "그렇다" },
+        { "value": 0, "text": "매우 그렇다" }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "어떤 것도 표현하지 않는 추상미술은 전혀 예술로 간주되어서는 안 된다",
+      "type": "scale",
+      "dimension": "social",
+      "options": [
+        { "value": 4, "text": "매우 그렇지 않다" },
+        { "value": 3, "text": "그렇지 않다" },
+        { "value": 2, "text": "보통이다" },
+        { "value": 1, "text": "그렇다" },
+        { "value": 0, "text": "매우 그렇다" }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "많은 개인의 재산이 단순히 돈을 조작하고 사회에 아무런 기여도 하지 않는 사람들에 의해 만들어지는 것은 유감스러운 일이다",
+      "type": "scale",
+      "dimension": "economic",
+      "options": [
+        { "value": 0, "text": "매우 그렇지 않다" },
+        { "value": 1, "text": "그렇지 않다" },
+        { "value": 2, "text": "보통이다" },
+        { "value": 3, "text": "그렇다" },
+        { "value": 4, "text": "매우 그렇다" }
+      ]
+    }
+  ],
+  "analysis": {
+    "dimensions": [
+      {
+        "key": "economic",
+        "name": "경제 좌/우",
+        "questions": ["q2", "q4", "q6"],
+        "scoring": {
+          "0": 0, "1": 25, "2": 50, "3": 75, "4": 100
+        }
+      },
+      {
+        "key": "social",
+        "name": "사회 자유주의/권위주의",
+        "questions": ["q1", "q3", "q5"],
+        "scoring": {
+          "0": 0, "1": 25, "2": 50, "3": 75, "4": 100
+        }
+      }
+    ],
+    "resultTypes": [
+      {
+        "dimension": "economic",
+        "categories": [
+          {
+            "key": "left",
+            "min": 0,
+            "max": 49,
+            "description": "경제 좌파: 정부의 경제 개입과 부의 재분배를 선호합니다.",
+            "traits": ["사회주의적", "개입주의적", "재분배주의적", "집단적"]
+          },
+          {
+            "key": "right",
+            "min": 50,
+            "max": 100,
+            "description": "경제 우파: 자유시장과 최소한의 정부 경제 개입을 선호합니다.",
+            "traits": ["자본주의적", "자유시장주의적", "개인주의적", "자유방임주의적"]
+          }
+        ]
+      },
+      {
+        "key": "social",
+        "categories": [
+          {
+            "key": "libertarian",
+            "min": 50,
+            "max": 100,
+            "description": "사회 자유주의: 개인의 자유와 최소한의 정부 사회 통제를 선호합니다.",
+            "traits": ["진보적", "관대한", "진보적", "개인주의적"]
+          },
+          {
+            "key": "authoritarian",
+            "min": 0,
+            "max": 49,
+            "description": "사회 권위주의: 전통적 가치와 강한 정부 사회 통제를 선호합니다.",
+            "traits": ["보수적", "전통적", "권위주의적", "질서 중심적"]
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "text": "당신의 정치적 성향은 경제적으로는 {economic}, 사회적으로는 {social}입니다. 이는 당신을 정치 나침반의 {economic}-{social} 사분면에 위치시킵니다."
+    }
+  }
+}

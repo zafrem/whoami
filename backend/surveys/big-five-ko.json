@@ -1,0 +1,234 @@
+{
+  "name": "빅 파이브 성격 검사",
+  "description": "5가지 주요 성격 차원에서 당신의 성격을 평가해보세요: 개방성, 성실성, 외향성, 친화성, 신경성.",
+  "category": "personality",
+  "language": "ko",
+  "baseId": "big-five-personality-test",
+  "estimatedTime": 12,
+  "difficulty": "medium",
+  "tags": ["성격", "심리학", "빅파이브", "성격분석"],
+  "questions": [
+    {
+      "id": "q1",
+      "text": "나는 파티의 중심인물이다",
+      "type": "scale",
+      "dimension": "extraversion",
+      "options": [
+        { "value": 1, "text": "전혀 그렇지 않다" },
+        { "value": 2, "text": "그렇지 않다" },
+        { "value": 3, "text": "보통이다" },
+        { "value": 4, "text": "그렇다" },
+        { "value": 5, "text": "매우 그렇다" }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "나는 다른 사람들에 대한 관심이 거의 없다",
+      "type": "scale",
+      "dimension": "agreeableness",
+      "options": [
+        { "value": 5, "text": "전혀 그렇지 않다" },
+        { "value": 4, "text": "그렇지 않다" },
+        { "value": 3, "text": "보통이다" },
+        { "value": 2, "text": "그렇다" },
+        { "value": 1, "text": "매우 그렇다" }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "나는 항상 준비가 되어 있다",
+      "type": "scale",
+      "dimension": "conscientiousness",
+      "options": [
+        { "value": 1, "text": "전혀 그렇지 않다" },
+        { "value": 2, "text": "그렇지 않다" },
+        { "value": 3, "text": "보통이다" },
+        { "value": 4, "text": "그렇다" },
+        { "value": 5, "text": "매우 그렇다" }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "나는 쉽게 스트레스를 받는다",
+      "type": "scale",
+      "dimension": "neuroticism",
+      "options": [
+        { "value": 1, "text": "전혀 그렇지 않다" },
+        { "value": 2, "text": "그렇지 않다" },
+        { "value": 3, "text": "보통이다" },
+        { "value": 4, "text": "그렇다" },
+        { "value": 5, "text": "매우 그렇다" }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "나는 풍부한 어휘력을 가지고 있다",
+      "type": "scale",
+      "dimension": "openness",
+      "options": [
+        { "value": 1, "text": "전혀 그렇지 않다" },
+        { "value": 2, "text": "그렇지 않다" },
+        { "value": 3, "text": "보통이다" },
+        { "value": 4, "text": "그렇다" },
+        { "value": 5, "text": "매우 그렇다" }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "나는 말이 별로 없다",
+      "type": "scale",
+      "dimension": "extraversion",
+      "options": [
+        { "value": 5, "text": "전혀 그렇지 않다" },
+        { "value": 4, "text": "그렇지 않다" },
+        { "value": 3, "text": "보통이다" },
+        { "value": 2, "text": "그렇다" },
+        { "value": 1, "text": "매우 그렇다" }
+      ]
+    }
+  ],
+  "analysis": {
+    "dimensions": [
+      {
+        "key": "extraversion",
+        "name": "외향성",
+        "questions": ["q1", "q6"],
+        "scoring": {
+          "1": 20, "2": 40, "3": 60, "4": 80, "5": 100
+        }
+      },
+      {
+        "key": "agreeableness",
+        "name": "친화성",
+        "questions": ["q2"],
+        "scoring": {
+          "1": 20, "2": 40, "3": 60, "4": 80, "5": 100
+        }
+      },
+      {
+        "key": "conscientiousness",
+        "name": "성실성",
+        "questions": ["q3"],
+        "scoring": {
+          "1": 20, "2": 40, "3": 60, "4": 80, "5": 100
+        }
+      },
+      {
+        "key": "neuroticism",
+        "name": "신경성",
+        "questions": ["q4"],
+        "scoring": {
+          "1": 20, "2": 40, "3": 60, "4": 80, "5": 100
+        }
+      },
+      {
+        "key": "openness",
+        "name": "개방성",
+        "questions": ["q5"],
+        "scoring": {
+          "1": 20, "2": 40, "3": 60, "4": 80, "5": 100
+        }
+      }
+    ],
+    "resultTypes": [
+      {
+        "dimension": "extraversion",
+        "categories": [
+          {
+            "key": "introverted",
+            "min": 0,
+            "max": 49,
+            "description": "당신은 조용하고 차분한 환경을 선호하는 내향적 성향을 가지고 있습니다.",
+            "traits": ["내성적", "조용함", "사색적", "독립적"]
+          },
+          {
+            "key": "extraverted",
+            "min": 50,
+            "max": 100,
+            "description": "당신은 외향적이며 활동적이고 사회적 상황을 즐기는 성향을 가지고 있습니다.",
+            "traits": ["외향적", "활동적", "사교적", "적극적"]
+          }
+        ]
+      },
+      {
+        "dimension": "agreeableness",
+        "categories": [
+          {
+            "key": "competitive",
+            "min": 0,
+            "max": 49,
+            "description": "당신은 경쟁적이며 다른 사람들의 동기에 대해 회의적인 성향을 가지고 있습니다.",
+            "traits": ["경쟁적", "회의적", "도전적", "강인한"]
+          },
+          {
+            "key": "cooperative",
+            "min": 50,
+            "max": 100,
+            "description": "당신은 자비롭고 신뢰하며 다른 사람들을 도우려는 성향을 가지고 있습니다.",
+            "traits": ["자비로운", "신뢰하는", "도움이 되는", "솔직한"]
+          }
+        ]
+      },
+      {
+        "dimension": "conscientiousness",
+        "categories": [
+          {
+            "key": "flexible",
+            "min": 0,
+            "max": 49,
+            "description": "당신은 엄격한 조직화보다는 유연성과 즉흥성을 선호하는 성향을 가지고 있습니다.",
+            "traits": ["유연한", "즉흥적", "부주의한", "비조직적"]
+          },
+          {
+            "key": "focused",
+            "min": 50,
+            "max": 100,
+            "description": "당신은 조직적이며 책임감 있고 목표 지향적인 성향을 가지고 있습니다.",
+            "traits": ["조직적", "책임감 있는", "신뢰할 수 있는", "자기 절제적"]
+          }
+        ]
+      },
+      {
+        "dimension": "neuroticism",
+        "categories": [
+          {
+            "key": "resilient",
+            "min": 0,
+            "max": 49,
+            "description": "당신은 압박 상황에서도 차분하고 정서적으로 안정된 성향을 가지고 있습니다.",
+            "traits": ["차분한", "편안한", "안전한", "견고한"]
+          },
+          {
+            "key": "reactive",
+            "min": 50,
+            "max": 100,
+            "description": "당신은 민감하며 스트레스와 부정적인 감정을 경험하기 쉬운 성향을 가지고 있습니다.",
+            "traits": ["불안한", "쉽게 화나는", "감정적으로 반응하는", "취약한"]
+          }
+        ]
+      },
+      {
+        "dimension": "openness",
+        "categories": [
+          {
+            "key": "practical",
+            "min": 0,
+            "max": 49,
+            "description": "당신은 관습적인 접근법과 친숙한 루틴을 선호하는 성향을 가지고 있습니다.",
+            "traits": ["관습적", "현실적", "제한적 관심", "비창의적"]
+          },
+          {
+            "key": "creative",
+            "min": 50,
+            "max": 100,
+            "description": "당신은 호기심 많고 창의적이며 새로운 경험에 개방적인 성향을 가지고 있습니다.",
+            "traits": ["호기심 많은", "창의적", "모험적", "지적인"]
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "text": "당신의 빅 파이브 성격 프로필은 {extraversion}, {agreeableness}, {conscientiousness}, {neuroticism}, {openness}의 특성을 보여줍니다. 이러한 조합은 당신이 세상과 상호작용하는 방식에 영향을 미치는 독특한 성격 특성을 만들어냅니다."
+    }
+  }
+}

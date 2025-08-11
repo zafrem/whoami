@@ -1,0 +1,159 @@
+{
+  "name": {
+    "en": "Political Compass",
+    "ko": "정치 성향 나침반"
+  },
+  "description": {
+    "en": "Discover your political orientation on both economic and social axes.",
+    "ko": "경제적, 사회적 축에서의 당신의 정치적 성향을 발견해보세요."
+  },
+  "category": "political",
+  "language": "en",
+  "baseId": "political-compass",
+  "estimatedTime": 10,
+  "difficulty": "easy",
+  "tags": ["political", "ideology", "economics", "social"],
+  "questions": [
+    {
+      "id": "q1",
+      "text": "A significant advantage of a one-party state is that it avoids all the arguments that delay progress in a democratic political system",
+      "type": "scale",
+      "dimension": "social",
+      "options": [
+        { "value": 4, "text": "Strongly Disagree" },
+        { "value": 3, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 1, "text": "Agree" },
+        { "value": 0, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "The freer the market, the freer the people",
+      "type": "scale",
+      "dimension": "economic",
+      "options": [
+        { "value": 0, "text": "Strongly Disagree" },
+        { "value": 1, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 3, "text": "Agree" },
+        { "value": 4, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "The death penalty should be an option for the most serious crimes",
+      "type": "scale",
+      "dimension": "social",
+      "options": [
+        { "value": 4, "text": "Strongly Disagree" },
+        { "value": 3, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 1, "text": "Agree" },
+        { "value": 0, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "A genuine free market requires restrictions on the ability of predator multinationals to create monopolies",
+      "type": "scale",
+      "dimension": "economic",
+      "options": [
+        { "value": 4, "text": "Strongly Disagree" },
+        { "value": 3, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 1, "text": "Agree" },
+        { "value": 0, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "Abstract art that doesn't represent anything shouldn't be considered art at all",
+      "type": "scale",
+      "dimension": "social",
+      "options": [
+        { "value": 4, "text": "Strongly Disagree" },
+        { "value": 3, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 1, "text": "Agree" },
+        { "value": 0, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "It is regrettable that many personal fortunes are made by people who simply manipulate money and contribute nothing to their society",
+      "type": "scale",
+      "dimension": "economic",
+      "options": [
+        { "value": 0, "text": "Strongly Disagree" },
+        { "value": 1, "text": "Disagree" },
+        { "value": 2, "text": "Neutral" },
+        { "value": 3, "text": "Agree" },
+        { "value": 4, "text": "Strongly Agree" }
+      ]
+    }
+  ],
+  "analysis": {
+    "dimensions": [
+      {
+        "key": "economic",
+        "name": "Economic Left/Right",
+        "questions": ["q2", "q4", "q6"],
+        "scoring": {
+          "0": 0, "1": 25, "2": 50, "3": 75, "4": 100
+        }
+      },
+      {
+        "key": "social",
+        "name": "Social Libertarian/Authoritarian",
+        "questions": ["q1", "q3", "q5"],
+        "scoring": {
+          "0": 0, "1": 25, "2": 50, "3": 75, "4": 100
+        }
+      }
+    ],
+    "resultTypes": [
+      {
+        "dimension": "economic",
+        "categories": [
+          {
+            "key": "left",
+            "min": 0,
+            "max": 49,
+            "description": "Economic Left: You favor government intervention in the economy and wealth redistribution.",
+            "traits": ["socialist", "interventionist", "redistributionist", "collective"]
+          },
+          {
+            "key": "right",
+            "min": 50,
+            "max": 100,
+            "description": "Economic Right: You favor free markets and minimal government economic intervention.",
+            "traits": ["capitalist", "free-market", "individualist", "laissez-faire"]
+          }
+        ]
+      },
+      {
+        "key": "social",
+        "categories": [
+          {
+            "key": "libertarian",
+            "min": 50,
+            "max": 100,
+            "description": "Social Libertarian: You favor individual freedom and minimal government social control.",
+            "traits": ["liberal", "permissive", "progressive", "individualist"]
+          },
+          {
+            "key": "authoritarian",
+            "min": 0,
+            "max": 49,
+            "description": "Social Authoritarian: You favor traditional values and strong government social control.",
+            "traits": ["conservative", "traditional", "authoritarian", "order-focused"]
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "text": "Your political orientation is {economic} economically and {social} socially. This places you in the {economic}-{social} quadrant of the political compass."
+    }
+  }
+}

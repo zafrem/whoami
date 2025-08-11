@@ -1,0 +1,232 @@
+{
+  "name": "Big Five Personality Test",
+  "description": "Assess your personality across the five major dimensions: Openness, Conscientiousness, Extraversion, Agreeableness, and Neuroticism.",
+  "category": "personality",
+  "estimatedTime": 12,
+  "difficulty": "medium",
+  "tags": ["personality", "psychology", "big-five", "ocean"],
+  "questions": [
+    {
+      "id": "q1",
+      "text": "I am the life of the party",
+      "type": "scale",
+      "dimension": "extraversion",
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "I feel little concern for others",
+      "type": "scale",
+      "dimension": "agreeableness",
+      "options": [
+        { "value": 5, "text": "Strongly Disagree" },
+        { "value": 4, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 2, "text": "Agree" },
+        { "value": 1, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "I am always prepared",
+      "type": "scale",
+      "dimension": "conscientiousness",
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "I get stressed out easily",
+      "type": "scale",
+      "dimension": "neuroticism",
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "I have a rich vocabulary",
+      "type": "scale",
+      "dimension": "openness",
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "I don't talk a lot",
+      "type": "scale",
+      "dimension": "extraversion",
+      "options": [
+        { "value": 5, "text": "Strongly Disagree" },
+        { "value": 4, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 2, "text": "Agree" },
+        { "value": 1, "text": "Strongly Agree" }
+      ]
+    }
+  ],
+  "analysis": {
+    "dimensions": [
+      {
+        "key": "extraversion",
+        "name": "Extraversion",
+        "questions": ["q1", "q6"],
+        "scoring": {
+          "1": 20, "2": 40, "3": 60, "4": 80, "5": 100
+        }
+      },
+      {
+        "key": "agreeableness",
+        "name": "Agreeableness",
+        "questions": ["q2"],
+        "scoring": {
+          "1": 20, "2": 40, "3": 60, "4": 80, "5": 100
+        }
+      },
+      {
+        "key": "conscientiousness",
+        "name": "Conscientiousness",
+        "questions": ["q3"],
+        "scoring": {
+          "1": 20, "2": 40, "3": 60, "4": 80, "5": 100
+        }
+      },
+      {
+        "key": "neuroticism",
+        "name": "Neuroticism",
+        "questions": ["q4"],
+        "scoring": {
+          "1": 20, "2": 40, "3": 60, "4": 80, "5": 100
+        }
+      },
+      {
+        "key": "openness",
+        "name": "Openness",
+        "questions": ["q5"],
+        "scoring": {
+          "1": 20, "2": 40, "3": 60, "4": 80, "5": 100
+        }
+      }
+    ],
+    "resultTypes": [
+      {
+        "dimension": "extraversion",
+        "categories": [
+          {
+            "key": "introverted",
+            "min": 0,
+            "max": 49,
+            "description": "You tend to be reserved and prefer quiet, low-key environments.",
+            "traits": ["reserved", "quiet", "thoughtful", "independent"]
+          },
+          {
+            "key": "extraverted",
+            "min": 50,
+            "max": 100,
+            "description": "You are outgoing, energetic, and enjoy social situations.",
+            "traits": ["outgoing", "energetic", "social", "assertive"]
+          }
+        ]
+      },
+      {
+        "dimension": "agreeableness",
+        "categories": [
+          {
+            "key": "competitive",
+            "min": 0,
+            "max": 49,
+            "description": "You tend to be competitive and skeptical of others' motives.",
+            "traits": ["competitive", "skeptical", "challenging", "tough-minded"]
+          },
+          {
+            "key": "cooperative",
+            "min": 50,
+            "max": 100,
+            "description": "You are compassionate, trusting, and eager to help others.",
+            "traits": ["compassionate", "trusting", "helpful", "straightforward"]
+          }
+        ]
+      },
+      {
+        "dimension": "conscientiousness",
+        "categories": [
+          {
+            "key": "flexible",
+            "min": 0,
+            "max": 49,
+            "description": "You prefer flexibility and spontaneity over strict organization.",
+            "traits": ["flexible", "spontaneous", "careless", "disorganized"]
+          },
+          {
+            "key": "focused",
+            "min": 50,
+            "max": 100,
+            "description": "You are organized, responsible, and goal-oriented.",
+            "traits": ["organized", "responsible", "reliable", "self-disciplined"]
+          }
+        ]
+      },
+      {
+        "dimension": "neuroticism",
+        "categories": [
+          {
+            "key": "resilient",
+            "min": 0,
+            "max": 49,
+            "description": "You tend to be calm and emotionally stable under pressure.",
+            "traits": ["calm", "relaxed", "secure", "hardy"]
+          },
+          {
+            "key": "reactive",
+            "min": 50,
+            "max": 100,
+            "description": "You are sensitive and prone to experiencing stress and negative emotions.",
+            "traits": ["anxious", "easily upset", "emotionally reactive", "vulnerable"]
+          }
+        ]
+      },
+      {
+        "dimension": "openness",
+        "categories": [
+          {
+            "key": "practical",
+            "min": 0,
+            "max": 49,
+            "description": "You prefer conventional approaches and familiar routines.",
+            "traits": ["conventional", "down-to-earth", "narrow interests", "uncreative"]
+          },
+          {
+            "key": "creative",
+            "min": 50,
+            "max": 100,
+            "description": "You are curious, creative, and open to new experiences.",
+            "traits": ["curious", "creative", "adventurous", "intellectual"]
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "text": "Your Big Five personality profile shows you as {extraversion}, {agreeableness}, {conscientiousness}, {neuroticism}, and {openness}. This combination creates a unique personality signature that influences how you interact with the world."
+    }
+  }
+}

@@ -11,6 +11,9 @@ A multilingual personality assessment web application supporting MBTI, Political
 - Guest mode for anonymous survey taking
 - Result analytics and export functionality
 
+## Demo
+[demo](./image/demo.gif)
+
 ## How to Run
 
 ### Production Deployment

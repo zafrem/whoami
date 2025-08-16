@@ -12,7 +12,7 @@ A multilingual personality assessment web application supporting MBTI, Political
 - Result analytics and export functionality
 
 ## Demo
-[demo](./image/demo.gif)
+![demo](./image/demo.gif)
 
 ## How to Run
 
@@ -112,5 +112,15 @@ RATE_LIMIT_MAX=100
 - **Database Issues**: Ensure PostgreSQL is running (start script handles this automatically)
 
 ---
+
+# Others My Projects
+- Red (Who am I?) : [This Project](https://github.com/zafrem/Who-am-I/blob/main/README.md)
+- Orange (How did I live?) : [Life History](https://github.com/zafrem/How-did-I-live/blob/main/README.md)
+- Yellow (How shall I live?) : [Future Life](https://github.com/zafrem/How-shall-I-live/blob/main/README.md)
+- Green
+- Blue
+- Indigo
+- Violet
+
 
 For detailed documentation including API endpoints, configuration options, deployment guides, and development instructions, please visit the [Wiki](../../wiki).

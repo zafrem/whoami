@@ -89,30 +89,52 @@
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                <button
-                  @click="copyIframeLink(survey)"
-                  class="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded hover:bg-blue-200 mr-2"
-                  title="Copy survey link"
-                >
-                  <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
-                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path>
-                  </svg>
-                  Copy Link
-                </button>
-                <button
-                  v-if="survey.isExternal"
-                  @click="viewExternalSurvey(survey)"
-                  class="text-primary-600 hover:text-primary-900"
-                >
-                  View External
-                </button>
-                <button
-                  @click="deleteSurvey(survey)"
-                  class="text-red-600 hover:text-red-900"
-                >
-                  Delete
-                </button>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    @click="copyIframeLink(survey)"
+                    class="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded hover:bg-blue-200"
+                    title="Copy embeddable iframe link"
+                  >
+                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"></path>
+                      <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"></path>
+                    </svg>
+                    Copy Embed Link
+                  </button>
+                  <button
+                    @click="copyDirectLink(survey)"
+                    class="inline-flex items-center px-2 py-1 text-xs bg-green-100 text-green-800 rounded hover:bg-green-200"
+                    title="Copy direct survey link"
+                  >
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"></path>
+                    </svg>
+                    Copy Direct Link
+                  </button>
+                  <button
+                    @click="showEmbedCode(survey)"
+                    class="inline-flex items-center px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded hover:bg-purple-200"
+                    title="Get iframe embed code"
+                  >
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+                    </svg>
+                    Embed Code
+                  </button>
+                  <button
+                    v-if="survey.isExternal"
+                    @click="viewExternalSurvey(survey)"
+                    class="inline-flex items-center px-2 py-1 text-xs bg-gray-100 text-gray-800 rounded hover:bg-gray-200"
+                  >
+                    View External
+                  </button>
+                  <button
+                    @click="deleteSurvey(survey)"
+                    class="inline-flex items-center px-2 py-1 text-xs bg-red-100 text-red-800 rounded hover:bg-red-200"
+                  >
+                    Delete
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -241,6 +263,111 @@
         </div>
       </div>
     </div>
+
+    <!-- Embed Code Modal -->
+    <div v-if="showEmbedModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+      <div class="relative top-10 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+        <div class="mt-3">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Embed Survey: {{ getLocalizedText(selectedSurvey?.name) }}</h3>
+          
+          <div class="space-y-4">
+            <!-- Embed URL -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Embeddable URL</label>
+              <div class="flex">
+                <input
+                  :value="embedUrl"
+                  readonly
+                  class="flex-1 form-input bg-gray-50"
+                />
+                <button
+                  @click="copyText(embedUrl)"
+                  class="ml-2 btn-secondary px-3"
+                >
+                  Copy
+                </button>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Use this URL directly in an iframe</p>
+            </div>
+
+            <!-- Iframe Code -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Iframe Embed Code</label>
+              <div class="relative">
+                <textarea
+                  :value="iframeCode"
+                  readonly
+                  rows="4"
+                  class="w-full form-input bg-gray-50 font-mono text-sm"
+                ></textarea>
+                <button
+                  @click="copyText(iframeCode)"
+                  class="absolute top-2 right-2 btn-secondary px-3 py-1 text-xs"
+                >
+                  Copy
+                </button>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Paste this HTML code into any webpage</p>
+            </div>
+
+            <!-- Customization Options -->
+            <div class="border-t pt-4">
+              <h4 class="text-sm font-medium text-gray-900 mb-3">Customization Options</h4>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm text-gray-700">Width</label>
+                  <input
+                    v-model="embedOptions.width"
+                    type="text"
+                    class="form-input text-sm"
+                    placeholder="100%"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm text-gray-700">Height</label>
+                  <input
+                    v-model="embedOptions.height"
+                    type="text"
+                    class="form-input text-sm"
+                    placeholder="600px"
+                  />
+                </div>
+              </div>
+              <div class="mt-3">
+                <label class="flex items-center text-sm">
+                  <input
+                    v-model="embedOptions.allowFullscreen"
+                    type="checkbox"
+                    class="rounded border-gray-300 text-primary-600"
+                  />
+                  <span class="ml-2">Allow fullscreen</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Preview -->
+            <div class="border-t pt-4">
+              <h4 class="text-sm font-medium text-gray-900 mb-3">Preview</h4>
+              <div class="border border-gray-300 rounded-lg bg-gray-50 p-4">
+                <iframe
+                  :src="embedUrl"
+                  :width="embedOptions.width"
+                  :height="embedOptions.height === 'auto' ? '400px' : embedOptions.height"
+                  :allowfullscreen="embedOptions.allowFullscreen"
+                  frameborder="0"
+                  class="border border-gray-200 rounded"
+                ></iframe>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex space-x-3 pt-6 border-t">
+            <button @click="copyText(iframeCode)" class="btn-primary">Copy Embed Code</button>
+            <button @click="showEmbedModal = false" class="btn-secondary">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -262,6 +389,7 @@ const users = ref([])
 const loading = ref(false)
 const showCreateSurvey = ref(false)
 const showExternalLink = ref(false)
+const showEmbedModal = ref(false)
 const selectedSurvey = ref(null)
 
 const newSurvey = ref({
@@ -275,6 +403,23 @@ const newSurvey = ref({
   externalUrl: '',
   questionsJson: '',
   analysisJson: ''
+})
+
+const embedOptions = ref({
+  width: '100%',
+  height: '600px',
+  allowFullscreen: true
+})
+
+const embedUrl = computed(() => {
+  if (!selectedSurvey.value) return ''
+  return `${window.location.origin}/embed/${selectedSurvey.value.id}`
+})
+
+const iframeCode = computed(() => {
+  if (!selectedSurvey.value) return ''
+  const fullscreenAttr = embedOptions.value.allowFullscreen ? ' allowfullscreen' : ''
+  return `<iframe src="${embedUrl.value}" width="${embedOptions.value.width}" height="${embedOptions.value.height}" frameborder="0"${fullscreenAttr}></iframe>`
 })
 
 // Check admin access
@@ -368,28 +513,41 @@ const deleteSurvey = async (survey) => {
 }
 
 const copyIframeLink = async (survey) => {
-  const surveyUrl = `${window.location.origin}/survey/${survey.id}`
-  
+  const embedUrl = `${window.location.origin}/embed/${survey.id}`
+  await copyText(embedUrl)
+  window.showNotification('success', 'Success', 'Embed link copied to clipboard!')
+}
+
+const copyDirectLink = async (survey) => {
+  const directUrl = `${window.location.origin}/survey/${survey.id}`
+  await copyText(directUrl)
+  window.showNotification('success', 'Success', 'Direct survey link copied to clipboard!')
+}
+
+const copyText = async (text) => {
   try {
-    await navigator.clipboard.writeText(surveyUrl)
-    window.showNotification('success', 'Success', 'Survey link copied to clipboard!')
+    await navigator.clipboard.writeText(text)
   } catch (error) {
     // Fallback for browsers that don't support clipboard API
     const textArea = document.createElement('textarea')
-    textArea.value = surveyUrl
+    textArea.value = text
     document.body.appendChild(textArea)
     textArea.select()
     textArea.setSelectionRange(0, 99999) // For mobile devices
     
     try {
       document.execCommand('copy')
-      window.showNotification('success', 'Success', 'Survey link copied to clipboard!')
     } catch (fallbackError) {
-      window.showNotification('error', 'Error', 'Failed to copy link. Please copy manually: ' + surveyUrl)
+      window.showNotification('error', 'Error', 'Failed to copy. Please copy manually: ' + text)
     }
     
     document.body.removeChild(textArea)
   }
+}
+
+const showEmbedCode = (survey) => {
+  selectedSurvey.value = survey
+  showEmbedModal.value = true
 }
 
 const viewExternalSurvey = (survey) => {

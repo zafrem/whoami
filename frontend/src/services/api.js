@@ -4,7 +4,7 @@ import axios from 'axios'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 
   (typeof window !== 'undefined' && window.location.origin.includes('vercel.app')) 
     ? `${window.location.origin}/api` 
-    : 'http://localhost:3000/api'
+    : '/api'  // Use proxy in development
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -135,6 +135,25 @@ stop_docker() {
 stop_native() {
     print_status "Stopping native processes..."
     
+    # Stop processes using PID files (from improved start script)
+    if [ -f .pids/main.pid ]; then
+        print_status "Stopping main process..."
+        kill $(cat .pids/main.pid) 2>/dev/null || true
+        rm -f .pids/main.pid
+    fi
+
+    if [ -f .pids/backend.pid ]; then
+        print_status "Stopping backend server..."
+        kill $(cat .pids/backend.pid) 2>/dev/null || true
+        rm -f .pids/backend.pid
+    fi
+
+    if [ -f .pids/frontend.pid ]; then
+        print_status "Stopping frontend server..."
+        kill $(cat .pids/frontend.pid) 2>/dev/null || true
+        rm -f .pids/frontend.pid
+    fi
+    
     # Find and kill Node.js processes running our application
     local pids=$(pgrep -f "personality-survey" 2>/dev/null || true)
     local node_pids=$(pgrep -f "node.*server.js\|npm.*dev\|vite" 2>/dev/null || true)
@@ -174,8 +193,11 @@ stop_native() {
         pkill -f "npm" 2>/dev/null || true
     fi
     
-    # Clean up temp files
+    # Clean up temp files and PID directory
     rm -f temp_start.sh app.log nohup.out
+    if [ -d .pids ]; then
+        rm -rf .pids
+    fi
     
     print_status "Native processes stopped"
 }

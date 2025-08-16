@@ -29,19 +29,87 @@ A multilingual personality assessment web application supporting MBTI, Political
 
 ### Local Development
 
+#### Quick Start
+
 ```bash
 # Clone repository
 git clone <repository-url>
-cd whoami/frontend
+cd whoami
 
-# Install dependencies
-npm install
-
-# Start development server (with mock data)
-npm run dev
+# Start the application (automatically installs dependencies)
+./start.sh
 ```
 
-The application will be available at `http://localhost:8080`
+The application will be available at:
+- Frontend: `http://localhost:8080`
+- Backend API: `http://localhost:3000`
+- Health Check: `http://localhost:3000/api/health`
+
+#### Available Commands
+
+**Start Application:**
+```bash
+./start.sh                    # Start in development mode (native)
+./start.sh --docker           # Start using Docker containers
+./start.sh --mode production  # Start in production mode
+./start.sh --detached         # Start in background mode
+```
+
+**Stop Application:**
+```bash
+./stop.sh                     # Stop native processes
+./stop.sh --docker            # Stop Docker containers
+./stop.sh --force             # Force kill all processes
+```
+
+#### Manual Setup (Alternative)
+
+If you prefer manual setup:
+
+```bash
+# Backend setup
+cd backend
+npm install
+cp .env.example .env          # Configure your environment
+npm run dev                   # Start backend on port 3000
+
+# Frontend setup (in new terminal)
+cd frontend
+npm install
+npm run dev                   # Start frontend on port 8080
+```
+
+#### Environment Configuration
+
+The backend requires a `.env` file. Copy from `.env.example` and configure:
+
+```env
+NODE_ENV=development
+PORT=3000
+JWT_SECRET=your_jwt_secret_key_here
+JWT_EXPIRE=7d
+
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=personality_survey
+DB_USER=postgres
+DB_PASSWORD=password
+
+# CORS Configuration
+CORS_ORIGIN=http://localhost:8080
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX=100
+```
+
+#### Troubleshooting
+
+- **CORS Errors**: Ensure `CORS_ORIGIN` in `backend/.env` matches your frontend URL
+- **WebSocket Errors**: The improved start scripts prevent most WebSocket frame errors
+- **Port Conflicts**: Use `./stop.sh --force` to kill processes on conflicting ports
+- **Database Issues**: Ensure PostgreSQL is running (start script handles this automatically)
 
 ---
 

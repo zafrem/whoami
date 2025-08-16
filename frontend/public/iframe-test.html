@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Survey Iframe Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .iframe-container {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+        iframe {
+            width: 100%;
+            border: none;
+            display: block;
+        }
+        .demo-info {
+            background: #f0f9ff;
+            border: 1px solid #7dd3fc;
+            padding: 15px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Survey Iframe Embedding Demo</h1>
+        <p>This page demonstrates how surveys can be embedded into other websites using iframes.</p>
+        
+        <div class="demo-info">
+            <strong>Note:</strong> Replace the survey ID in the iframe src with an actual survey ID from your admin dashboard.
+            The example below uses a placeholder URL.
+        </div>
+
+        <h2>Embedded Survey Example</h2>
+        <div class="iframe-container">
+            <iframe 
+                src="http://localhost:8082/embed/bd44fe1d-a3b0-45f1-909e-c635447a5767" 
+                width="100%" 
+                height="600"
+                allowfullscreen>
+                Your browser does not support iframes.
+            </iframe>
+        </div>
+
+        <h2>Iframe Code Example</h2>
+        <p>To embed this survey on your website, use the following HTML code:</p>
+        <div class="code-block">
+&lt;iframe 
+    src="http://localhost:8082/embed/bd44fe1d-a3b0-45f1-909e-c635447a5767" 
+    width="100%" 
+    height="600"
+    frameborder="0"
+    allowfullscreen&gt;
+&lt;/iframe&gt;
+        </div>
+
+        <h2>Features of Embedded Surveys</h2>
+        <ul>
+            <li>Clean, minimal interface optimized for embedding</li>
+            <li>Responsive design that works on all screen sizes</li>
+            <li>No header, sidebar, or footer elements</li>
+            <li>Compact navigation and progress indicators</li>
+            <li>Graceful completion handling for embedded context</li>
+            <li>Secure iframe sandbox attributes supported</li>
+        </ul>
+
+        <h2>Responsive Example (Mobile-optimized)</h2>
+        <div class="iframe-container" style="max-width: 400px;">
+            <iframe 
+                src="http://localhost:8082/embed/bd44fe1d-a3b0-45f1-909e-c635447a5767" 
+                width="100%" 
+                height="500"
+                allowfullscreen>
+                Your browser does not support iframes.
+            </iframe>
+        </div>
+    </div>
+</body>
+</html>

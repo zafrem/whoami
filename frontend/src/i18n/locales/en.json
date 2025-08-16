@@ -149,6 +149,7 @@
     "lastNamePlaceholder": "Enter your last name", 
     "usernamePlaceholder": "Enter your username",
     "emailPlaceholder": "Enter your email address",
+    "passwordPlaceholder": "Enter your password",
     "passwordCreatePlaceholder": "Create a strong password",
     "confirmPasswordPlaceholder": "Confirm your password",
     "birthYear": "Birth Year",
@@ -162,7 +163,9 @@
       "title": "Welcome Back",
       "subtitle": "Sign in to continue your personality journey",
       "welcomeBack": "Welcome back!",
-      "successMessage": "You have successfully signed in."
+      "successMessage": "You have successfully signed in.",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up here"
     },
     "register": {
       "title": "Create Your Account",

@@ -1,0 +1,21 @@
+node_modules
+dist
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.DS_Store
+*.log
+coverage
+
+# Development files
+temp_start.sh
+app.log
+nohup.out
+.pids/
+*.pid
+
+# Vite specific
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*

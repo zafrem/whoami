@@ -1,5 +1,5 @@
 <template>
-  <div class="max-w-4xl mx-auto p-6">
+  <div :class="props.embedded ? 'p-4' : 'max-w-4xl mx-auto p-6'">
     <div v-if="surveyStore.loading && !currentSurvey" class="text-center py-12">
       <div class="animate-spin w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full mx-auto mb-4"></div>
       <p class="text-gray-600">{{ t('survey.loading') }}</p>
@@ -58,8 +58,8 @@
 
     <div v-else-if="currentSurvey && currentQuestions">
       <!-- Survey Header -->
-      <div class="mb-8">
-        <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ getLocalizedText(currentSurvey.name) }}</h1>
+      <div :class="props.embedded ? 'mb-4' : 'mb-8'">
+        <h1 :class="props.embedded ? 'text-xl font-bold text-gray-900 mb-2' : 'text-3xl font-bold text-gray-900 mb-2'">{{ getLocalizedText(currentSurvey.name) }}</h1>
         <p class="text-gray-600 mb-4">{{ getLocalizedText(currentSurvey.description) }}</p>
         
         <!-- Progress Bar -->
@@ -82,7 +82,7 @@
       </div>
 
       <!-- Question Navigation -->
-      <div v-if="totalQuestions > 1" class="mb-6">
+      <div v-if="totalQuestions > 1 && !props.embedded" class="mb-6">
         <div class="flex flex-wrap gap-2">
           <button
             v-for="(question, index) in currentQuestions.questions"
@@ -97,9 +97,9 @@
       </div>
 
       <!-- Current Question -->
-      <div v-if="currentQuestion" class="card mb-6">
-        <div class="mb-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">
+      <div v-if="currentQuestion" :class="props.embedded ? 'bg-white rounded-lg border border-gray-200 p-4 mb-4' : 'card mb-6'">
+        <div :class="props.embedded ? 'mb-4' : 'mb-6'">
+          <h2 :class="props.embedded ? 'text-lg font-semibold text-gray-900 mb-3' : 'text-xl font-semibold text-gray-900 mb-4'">
             {{ currentQuestion.text }}
           </h2>
 
@@ -158,24 +158,25 @@
       </div>
 
       <!-- Navigation Buttons -->
-      <div class="flex justify-between items-center">
+      <div :class="props.embedded ? 'flex justify-between items-center pt-4 border-t border-gray-200' : 'flex justify-between items-center'">
         <button
           v-if="currentQuestionIndex > 0"
           @click="previousQuestion"
-          class="btn-secondary flex items-center"
+          :class="props.embedded ? 'btn-secondary flex items-center text-sm px-3 py-2' : 'btn-secondary flex items-center'"
         >
           <ArrowLeftIcon class="w-4 h-4 mr-2" />
           {{ t('survey.previous') }}
         </button>
         <div v-else></div>
 
-        <div class="flex space-x-4">
+        <div class="flex space-x-3">
           <button
             v-if="currentQuestionIndex < totalQuestions - 1"
             @click="nextQuestion"
             :disabled="selectedAnswer === null"
-            class="btn-primary flex items-center"
-            :class="{ 'opacity-50 cursor-not-allowed': selectedAnswer === null }"
+            :class="props.embedded ? 'btn-primary flex items-center text-sm px-3 py-2' : 'btn-primary flex items-center'"
+            class="transition-opacity"
+            :style="{ opacity: selectedAnswer === null ? 0.5 : 1 }"
           >
             {{ t('survey.next') }}
             <ArrowRightIcon class="w-4 h-4 ml-2" />
@@ -185,7 +186,7 @@
             v-if="surveyStore.isCompleted"
             @click="submitSurvey"
             :disabled="surveyStore.loading"
-            class="btn-primary bg-green-600 hover:bg-green-700 flex items-center"
+            :class="props.embedded ? 'btn-primary bg-green-600 hover:bg-green-700 flex items-center text-sm px-3 py-2' : 'btn-primary bg-green-600 hover:bg-green-700 flex items-center'"
           >
             <span v-if="surveyStore.loading" class="animate-spin -ml-1 mr-3 h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
             {{ surveyStore.loading ? t('survey.submitting') : t('survey.submitSurvey') }}
@@ -195,7 +196,7 @@
     </div>
 
     <!-- Registration Prompt Modal -->
-    <div v-if="showRegistrationPrompt" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+    <div v-if="showRegistrationPrompt && !props.embedded" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div class="bg-white rounded-lg max-w-md w-full p-6">
         <h3 class="text-lg font-semibold text-gray-900 mb-4">{{ t('survey.saveResults.title') }}</h3>
         <p class="text-gray-600 mb-6">
@@ -218,6 +219,19 @@
         </div>
       </div>
     </div>
+
+    <!-- Embedded Mode Results Message -->
+    <div v-if="showRegistrationPrompt && props.embedded" class="bg-green-50 border border-green-200 rounded-lg p-4 mt-4">
+      <div class="flex items-center">
+        <svg class="w-5 h-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <div>
+          <h3 class="text-sm font-medium text-green-800">Survey Completed!</h3>
+          <p class="text-sm text-green-700 mt-1">Thank you for completing this survey. Your responses have been recorded.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -233,6 +247,10 @@ const props = defineProps({
   id: {
     type: String,
     required: true
+  },
+  embedded: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -260,7 +278,7 @@ const selectedAnswer = computed(() => {
   return surveyStore.currentProgress.answers[currentQuestion.value.id] ?? null
 })
 
-const timeSpent = computed(() => surveyStore.timeSpent)
+const timeSpent = ref(0)
 
 const formatTime = (seconds) => {
   const mins = Math.floor(seconds / 60)
@@ -337,7 +355,7 @@ const goToQuestion = (index) => {
 const submitSurvey = async () => {
   try {
     const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-    const result = await surveyStore.submitSurvey(authStore.isAuthenticated ? null : sessionId)
+    const result = await surveyStore.submitSurvey(authStore.isAuthenticated ? null : sessionId, timeSpent.value)
     
     if (result.needsRegistration) {
       showRegistrationPrompt.value = true
@@ -400,9 +418,16 @@ const viewResultsAsGuest = () => {
 }
 
 const startTimeTracking = () => {
+  // Initialize start time once
+  if (!surveyStore.currentProgress.startTime) {
+    surveyStore.currentProgress.startTime = new Date().toISOString()
+  }
+  
+  // Update time display every second without triggering reactive updates
   timeInterval.value = setInterval(() => {
-    // Force reactivity update
-    surveyStore.currentProgress.startTime = surveyStore.currentProgress.startTime || new Date().toISOString()
+    if (surveyStore.currentProgress.startTime) {
+      timeSpent.value = Math.floor((Date.now() - new Date(surveyStore.currentProgress.startTime).getTime()) / 1000)
+    }
   }, 1000)
 }
 

@@ -12,6 +12,9 @@
         </div>
 
         <div class="flex items-center space-x-4">
+          <!-- Theme Switcher -->
+          <ThemeSwitcher />
+          
           <!-- Language Switcher -->
           <LanguageSwitcher />
           
@@ -105,6 +108,7 @@ import { useI18n } from 'vue-i18n'
 import { ChevronDownIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
 import LanguageSwitcher from './LanguageSwitcher.vue'
+import ThemeSwitcher from './ThemeSwitcher.vue'
 
 const { t } = useI18n()
 const router = useRouter()

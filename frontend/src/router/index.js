@@ -51,6 +51,13 @@ const routes = [
     meta: { requiresAuth: false }
   },
   {
+    path: '/embed/:id',
+    name: 'SurveyEmbed',
+    component: SurveyTake,
+    props: route => ({ id: route.params.id, embedded: true }),
+    meta: { requiresAuth: false, embedded: true }
+  },
+  {
     path: '/result/:id',
     name: 'SurveyResult',
     component: SurveyResult,

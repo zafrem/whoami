@@ -235,21 +235,76 @@ start_native() {
         cd backend && npm run seed && cd .. || print_warning "Database seeding failed, continuing..."
     fi
     
-    # Create start script
+    # Create PID directory if it doesn't exist
+    mkdir -p .pids
+    
+    # Kill any existing processes
+    print_status "Stopping any existing processes..."
+    pkill -f "npm run dev" 2>/dev/null || true
+    pkill -f "vite" 2>/dev/null || true
+    pkill -f "nodemon" 2>/dev/null || true
+    sleep 2
+    
+    # Create improved start script
     cat > temp_start.sh << 'EOF'
 #!/bin/bash
-trap 'kill $(jobs -p)' EXIT
+
+# Get the base directory
+BASE_DIR=$(pwd)
+
+# Cleanup function
+cleanup() {
+    echo "Stopping all services..."
+    if [ -f "$BASE_DIR/.pids/backend.pid" ]; then
+        kill $(cat "$BASE_DIR/.pids/backend.pid") 2>/dev/null || true
+        rm -f "$BASE_DIR/.pids/backend.pid"
+    fi
+    if [ -f "$BASE_DIR/.pids/frontend.pid" ]; then
+        kill $(cat "$BASE_DIR/.pids/frontend.pid") 2>/dev/null || true
+        rm -f "$BASE_DIR/.pids/frontend.pid"
+    fi
+    pkill -f "npm run dev" 2>/dev/null || true
+    pkill -f "vite" 2>/dev/null || true
+    pkill -f "nodemon" 2>/dev/null || true
+    echo "All services stopped."
+    exit 0
+}
+
+# Set up signal handlers
+trap cleanup EXIT INT TERM
+
+# Create PID directory
+mkdir -p "$BASE_DIR/.pids"
 
 echo "Starting backend server..."
-cd backend && npm run dev &
-BACKEND_PID=$!
+if [ -d "$BASE_DIR/backend" ]; then
+    cd "$BASE_DIR/backend" && npm run dev &
+    BACKEND_PID=$!
+    echo $BACKEND_PID > "$BASE_DIR/.pids/backend.pid"
+    cd "$BASE_DIR"
+else
+    echo "Error: backend directory not found"
+    exit 1
+fi
 
 echo "Waiting for backend to start..."
 sleep 5
 
+# Check if backend is actually running
+if ! curl -s http://localhost:3000/api/health > /dev/null; then
+    echo "Warning: Backend may not be running properly"
+fi
+
 echo "Starting frontend server..."
-cd frontend && npm run dev &
-FRONTEND_PID=$!
+if [ -d "$BASE_DIR/frontend" ]; then
+    cd "$BASE_DIR/frontend" && npm run dev &
+    FRONTEND_PID=$!
+    echo $FRONTEND_PID > "$BASE_DIR/.pids/frontend.pid"
+    cd "$BASE_DIR"
+else
+    echo "Error: frontend directory not found"
+    exit 1
+fi
 
 echo ""
 echo "🚀 Application started successfully!"
@@ -257,8 +312,10 @@ echo "📱 Frontend: http://localhost:8080"
 echo "🔗 Backend API: http://localhost:3000"
 echo "📊 Health Check: http://localhost:3000/api/health"
 echo ""
+echo "PIDs stored in .pids/ directory"
 echo "Press Ctrl+C to stop all services"
 
+# Wait for processes
 wait
 EOF
 
@@ -266,9 +323,11 @@ EOF
     
     if [[ "$DETACHED" == true ]]; then
         nohup ./temp_start.sh > app.log 2>&1 &
+        echo $! > .pids/main.pid
         print_status "Application started in background. Check app.log for output"
         print_status "Frontend: http://localhost:8080"
         print_status "Backend: http://localhost:3000"
+        print_status "To stop: ./stop.sh"
     else
         ./temp_start.sh
     fi

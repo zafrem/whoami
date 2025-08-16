@@ -29,10 +29,7 @@ export const useSurveyStore = defineStore('survey', {
       return Object.keys(state.currentProgress.answers).length === state.currentQuestions.questions.length
     },
 
-    timeSpent: (state) => {
-      if (!state.currentProgress.startTime) return 0
-      return Math.floor((Date.now() - new Date(state.currentProgress.startTime).getTime()) / 1000)
-    }
+    // timeSpent removed - calculated in component to avoid constant reactivity
   },
 
   actions: {
@@ -134,7 +131,7 @@ export const useSurveyStore = defineStore('survey', {
       }
     },
 
-    async submitSurvey(sessionId = null) {
+    async submitSurvey(sessionId = null, timeSpent = 0) {
       this.loading = true
       this.error = null
 
@@ -142,7 +139,7 @@ export const useSurveyStore = defineStore('survey', {
         const response = await resultAPI.submit({
           surveyId: this.currentSurvey.id,
           answers: this.currentProgress.answers,
-          timeSpent: this.timeSpent,
+          timeSpent: timeSpent,
           sessionId
         })
         

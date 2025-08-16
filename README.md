@@ -116,7 +116,7 @@ RATE_LIMIT_MAX=100
 # Others My Projects
 - Red (Who am I?) : [This Project](https://github.com/zafrem/Who-am-I/blob/main/README.md)
 - Orange (How did I live?) : [Life History](https://github.com/zafrem/How-did-I-live/blob/main/README.md)
-- Yellow (How shall I live?) : [Future Life](https://github.com/zafrem/How-shall-I-live/blob/main/README.md)
+- Yellow
 - Green
 - Blue
 - Indigo

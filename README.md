@@ -116,11 +116,11 @@ RATE_LIMIT_MAX=100
 # Others My Projects
 - Red (Who am I?) : [This Project](https://github.com/zafrem/Who-am-I/blob/main/README.md)
 - Orange (How did I live?) : [Life History](https://github.com/zafrem/How-did-I-live/blob/main/README.md)
-- Yellow
-- Green
-- Blue
-- Indigo
-- Violet
+- Yellow (What am I not seeing?)
+- Green (What should I choose?)
+- Blue (How shall I live?)
+- Indigo (What do I need to heal?)
+- Violet (What is my next aligned step?)
 
 
 For detailed documentation including API endpoints, configuration options, deployment guides, and development instructions, please visit the [Wiki](../../wiki).

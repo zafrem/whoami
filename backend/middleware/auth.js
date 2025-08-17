@@ -10,7 +10,8 @@ const auth = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findByPk(decoded.id);
+    const userId = decoded.id || decoded.userId;
+    const user = await User.findByPk(userId);
     
     if (!user || !user.isActive) {
       return res.status(401).json({ error: 'Invalid token.' });
@@ -29,7 +30,8 @@ const optionalAuth = async (req, res, next) => {
     
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findByPk(decoded.id);
+      const userId = decoded.id || decoded.userId;
+      const user = await User.findByPk(userId);
       
       if (user && user.isActive) {
         req.user = user;

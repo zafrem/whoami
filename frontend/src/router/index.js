@@ -11,6 +11,7 @@ const SurveyResult = () => import('@/views/SurveyResult.vue')
 const ResultsList = () => import('@/views/ResultsList.vue')
 const ResultCompare = () => import('@/views/ResultCompare.vue')
 const Admin = () => import('@/views/Admin.vue')
+const Groups = () => import('@/views/Groups.vue')
 
 const routes = [
   {
@@ -82,6 +83,12 @@ const routes = [
     name: 'Admin',
     component: Admin,
     meta: { requiresAuth: true, requiresAdmin: true }
+  },
+  {
+    path: '/groups',
+    name: 'Groups',
+    component: Groups,
+    meta: { requiresAuth: false }
   },
   {
     path: '/:pathMatch(.*)*',

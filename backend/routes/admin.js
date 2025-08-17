@@ -8,7 +8,8 @@ const {
   createSurvey,
   updateSurvey,
   deleteSurvey,
-  getAllUsers
+  getAllUsers,
+  updateUser
 } = require('../controllers/adminController');
 
 // All admin routes require authentication and admin role
@@ -26,5 +27,6 @@ router.delete('/surveys/:id', deleteSurvey);
 
 // User management
 router.get('/users', getAllUsers);
+router.put('/users/:id', updateUser);
 
 module.exports = router;

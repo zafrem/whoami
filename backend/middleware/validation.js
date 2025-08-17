@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const { validationResult } = require('express-validator');
 
 const validate = (schema) => {
   return (req, res, next) => {
@@ -49,4 +50,18 @@ const schemas = {
   })
 };
 
-module.exports = { validate, schemas };
+const handleValidationErrors = (req, res, next) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({
+      error: 'Validation failed',
+      details: errors.array().map(error => ({
+        field: error.path,
+        message: error.msg
+      }))
+    });
+  }
+  next();
+};
+
+module.exports = { validate, schemas, handleValidationErrors };

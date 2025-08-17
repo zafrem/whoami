@@ -144,7 +144,41 @@
 
     <!-- User Management -->
     <div v-show="activeTab === 'users'" class="space-y-6">
-      <h2 class="text-xl font-semibold text-gray-900">User Management</h2>
+      <div class="flex justify-between items-start">
+        <div>
+          <h2 class="text-xl font-semibold text-gray-900">User Management</h2>
+          <p class="text-sm text-gray-600 mt-1">Manage user accounts, Pro subscriptions, and account status</p>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-lg">
+          <h3 class="text-sm font-medium text-blue-900 mb-2">🔐 Admin-Only Controls</h3>
+          <div class="text-xs text-blue-800 space-y-2">
+            <div class="bg-white rounded p-2 border border-blue-100">
+              <strong>Role Management (Admin ↔ User):</strong>
+              <br>• Promote users to Admin (grants management access)
+              <br>• Demote admins to User (removes management access)
+              <br>• Independent from Pro/Free status
+            </div>
+            <div class="bg-white rounded p-2 border border-blue-100">
+              <strong>Type Management (Pro ↔ Free):</strong>
+              <br>• Grant/Remove Pro access (Groups feature)
+              <br>• Independent from Admin/User role
+              <br>• Works for both admins and users
+            </div>
+            <div class="bg-white rounded p-2 border border-blue-100">
+              <strong>Account Control:</strong>
+              <br>• Activate/Deactivate any account
+              <br>• Controls login access to platform
+            </div>
+            <div class="bg-white rounded p-2 border border-blue-100">
+              <strong>Access Matrix:</strong>
+              <br>• <span class="text-purple-700">Admin + Pro:</span> Full access + Groups + Management
+              <br>• <span class="text-purple-700">Admin + Free:</span> Management + Basic features
+              <br>• <span class="text-yellow-700">User + Pro:</span> Groups + All features
+              <br>• <span class="text-gray-700">User + Free:</span> Basic features only
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="bg-white rounded-lg shadow overflow-hidden">
         <table class="min-w-full divide-y divide-gray-200">
@@ -152,9 +186,11 @@
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Age</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role Controls</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type Controls</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
@@ -168,14 +204,71 @@
                   {{ user.role }}
                 </span>
               </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span :class="user.isPro ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium">
+                  {{ user.isPro ? 'Pro' : 'Free' }}
+                </span>
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ user.birthYear ? (new Date().getFullYear() - user.birthYear) : 'N/A' }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 {{ user.lastLogin ? formatDate(user.lastLogin) : 'Never' }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ user.lastLoginLocation ? `${user.lastLoginLocation.country}, ${user.lastLoginLocation.city}` : 'Unknown' }}
+              
+              <!-- Role Controls Column -->
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <div class="flex flex-col space-y-2">
+                  <button
+                    @click="toggleUserRole(user)"
+                    :class="user.role === 'admin' ? 'bg-purple-600 hover:bg-purple-700 border-purple-600' : 'bg-blue-600 hover:bg-blue-700 border-blue-600'"
+                    class="inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-white rounded-md transition-all duration-200 border-2 hover:shadow-md"
+                    :title="user.role === 'admin' ? 'Demote to regular user - removes admin privileges' : 'Promote to admin - grants admin privileges'"
+                  >
+                    <svg v-if="user.role === 'admin'" class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                    </svg>
+                    <svg v-else class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                    </svg>
+                    {{ user.role === 'admin' ? 'Demote to User' : 'Promote to Admin' }}
+                  </button>
+                  
+                  <button
+                    @click="toggleUserActive(user)"
+                    :class="user.isActive ? 'bg-red-600 hover:bg-red-700 border-red-600' : 'bg-green-600 hover:bg-green-700 border-green-600'"
+                    class="inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-white rounded-md transition-all duration-200 border-2 hover:shadow-md"
+                    :title="user.isActive ? 'Deactivate account - user cannot log in' : 'Activate account - user can log in'"
+                  >
+                    <svg v-if="user.isActive" class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636"></path>
+                    </svg>
+                    <svg v-else class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ user.isActive ? 'Deactivate' : 'Activate' }}
+                  </button>
+                </div>
+              </td>
+              
+              <!-- Type Controls Column -->
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <div class="flex flex-col space-y-2">
+                  <button
+                    @click="toggleUserPro(user)"
+                    :class="user.isPro ? 'bg-yellow-600 hover:bg-yellow-700 border-yellow-600' : 'bg-green-600 hover:bg-green-700 border-green-600'"
+                    class="inline-flex items-center justify-center px-3 py-2 text-xs font-medium text-white rounded-md transition-all duration-200 border-2 hover:shadow-md"
+                    :title="user.isPro ? 'Remove Pro access - user will lose Groups feature' : 'Grant Pro access - user will gain Groups feature'"
+                  >
+                    <svg v-if="user.isPro" class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path>
+                    </svg>
+                    <svg v-else class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                    {{ user.isPro ? 'Remove Pro' : 'Make Pro' }}
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -578,5 +671,74 @@ const formatDate = (dateString) => {
     hour: '2-digit',
     minute: '2-digit'
   })
+}
+
+const toggleUserPro = async (user) => {
+  try {
+    const newProStatus = !user.isPro
+    const action = newProStatus ? 'upgrade to Pro' : 'downgrade to Free'
+    
+    if (!confirm(`Are you sure you want to ${action} user "${user.username}"?\n\n${newProStatus ? 'Pro users can access Groups and matching features.' : 'Free users will lose access to Groups and matching features.'}`)) {
+      return
+    }
+    
+    await api.put(`/admin/users/${user.id}`, {
+      isPro: newProStatus
+    })
+    
+    // Update local state
+    user.isPro = newProStatus
+    
+    alert(`✅ Success!\nUser "${user.username}" is now ${newProStatus ? 'Pro' : 'Free'}\n\n${newProStatus ? '• Can access Groups\n• Can use matching features\n• Full platform access' : '• Cannot access Groups\n• Cannot use matching features\n• Basic platform access only'}`)
+  } catch (error) {
+    console.error('Failed to update user Pro status:', error)
+    alert(`❌ Error\nFailed to update user Pro status.\n\nPlease try again or check the console for details.`)
+  }
+}
+
+const toggleUserRole = async (user) => {
+  try {
+    const newRole = user.role === 'admin' ? 'user' : 'admin'
+    const action = newRole === 'admin' ? 'promote to Admin' : 'demote to User'
+    
+    if (!confirm(`Are you sure you want to ${action} user "${user.username}"?\n\n${newRole === 'admin' ? 'User will gain:\n• Admin dashboard access\n• User management privileges\n• Survey management privileges' : 'User will lose:\n• Admin dashboard access\n• User management privileges\n• Survey management privileges'}\n\nThis is independent of Pro/Free status.`)) {
+      return
+    }
+    
+    await api.put(`/admin/users/${user.id}`, {
+      role: newRole
+    })
+    
+    // Update local state
+    user.role = newRole
+    
+    alert(`✅ Success!\nUser "${user.username}" is now ${newRole === 'admin' ? 'an Admin' : 'a regular User'}\n\n${newRole === 'admin' ? '• Can access admin dashboard\n• Can manage users and surveys\n• Has administrative privileges' : '• Cannot access admin dashboard\n• No management privileges\n• Regular user access only'}\n\nPro/Free status remains unchanged.`)
+  } catch (error) {
+    console.error('Failed to update user role:', error)
+    alert(`❌ Error\nFailed to update user role.\n\nPlease try again or check the console for details.`)
+  }
+}
+
+const toggleUserActive = async (user) => {
+  try {
+    const newActiveStatus = !user.isActive
+    const action = newActiveStatus ? 'activate' : 'deactivate'
+    
+    if (!confirm(`Are you sure you want to ${action} user "${user.username}"?\n\n${newActiveStatus ? 'User will be able to log in and use the platform.' : 'User will be unable to log in and access the platform.'}`)) {
+      return
+    }
+    
+    await api.put(`/admin/users/${user.id}`, {
+      isActive: newActiveStatus
+    })
+    
+    // Update local state
+    user.isActive = newActiveStatus
+    
+    alert(`✅ Success!\nUser "${user.username}" is now ${newActiveStatus ? 'active' : 'deactivated'}\n\n${newActiveStatus ? '• Can log in\n• Can use platform features\n• Account is active' : '• Cannot log in\n• Cannot access platform\n• Account is suspended'}`)
+  } catch (error) {
+    console.error('Failed to update user active status:', error)
+    alert(`❌ Error\nFailed to update user account status.\n\nPlease try again or check the console for details.`)
+  }
 }
 </script>

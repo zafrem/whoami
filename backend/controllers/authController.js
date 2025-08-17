@@ -129,7 +129,8 @@ const getProfile = async (req, res) => {
         lastName: req.user.lastName,
         lastLogin: req.user.lastLogin,
         createdAt: req.user.createdAt,
-        role: req.user.role
+        role: req.user.role,
+        isPro: req.user.isPro
       }
     });
   } catch (error) {

@@ -11,6 +11,37 @@
           </router-link>
         </div>
 
+        <!-- Navigation Links -->
+        <nav class="hidden md:flex space-x-8">
+          <router-link
+            to="/surveys"
+            class="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
+            :class="{ 'text-primary-600': $route.path === '/surveys' }"
+          >
+            Surveys
+          </router-link>
+          <router-link
+            v-if="authStore.isAuthenticated && authStore.user?.isPro"
+            to="/groups"
+            class="text-gray-700 hover:text-primary-600 px-3 py-2 text-sm font-medium transition-colors"
+            :class="{ 'text-primary-600': $route.path === '/groups' }"
+          >
+            Groups
+          </router-link>
+          <template v-if="authStore.isAuthenticated && authStore.user?.isPro">
+            <router-link
+              to="/pro-features"
+              class="text-primary-600 hover:text-primary-700 px-3 py-2 text-sm font-medium transition-colors flex items-center"
+              :class="{ 'text-primary-700': $route.path === '/pro-features' }"
+            >
+              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd" />
+              </svg>
+              Pro Features
+            </router-link>
+          </template>
+        </nav>
+
         <div class="flex items-center space-x-4">
           <!-- Theme Switcher -->
           <ThemeSwitcher />
@@ -76,6 +107,14 @@
                   @click="closeDropdown"
                 >
                   {{ t('navigation.results') }}
+                </router-link>
+                <router-link
+                  v-if="authStore.user?.isPro"
+                  to="/groups"
+                  class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  @click="closeDropdown"
+                >
+                  Groups
                 </router-link>
                 <router-link
                   v-if="authStore.user?.role === 'admin'"

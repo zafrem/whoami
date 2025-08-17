@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define('User', {
@@ -68,10 +69,27 @@ module.exports = (sequelize, DataTypes) => {
     role: {
       type: DataTypes.ENUM('user', 'admin'),
       defaultValue: 'user'
+    },
+    userHash: {
+      type: DataTypes.STRING,
+      allowNull: true,
+      unique: true
+    },
+    isPro: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   }, {
     hooks: {
+      beforeCreate: async (user) => {
+        if (!user.userHash) {
+          user.userHash = crypto.randomBytes(16).toString('hex');
+        }
+      },
       beforeSave: async (user) => {
+        if (!user.userHash) {
+          user.userHash = crypto.randomBytes(16).toString('hex');
+        }
         if (user.changed('password')) {
           const salt = await bcrypt.genSalt(12);
           user.password = await bcrypt.hash(user.password, salt);
@@ -96,6 +114,18 @@ module.exports = (sequelize, DataTypes) => {
     const values = { ...this.get() };
     delete values.password;
     return values;
+  };
+
+  User.associate = function(models) {
+    User.hasMany(models.Group, { 
+      foreignKey: 'createdBy', 
+      as: 'createdGroups' 
+    });
+    User.belongsToMany(models.Group, { 
+      through: 'GroupMembers',
+      as: 'joinedGroups',
+      foreignKey: 'userId'
+    });
   };
 
   return User;

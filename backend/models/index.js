@@ -25,6 +25,7 @@ const sequelize = new Sequelize(
 const User = require('./User')(sequelize, Sequelize.DataTypes);
 const Survey = require('./Survey')(sequelize, Sequelize.DataTypes);
 const Result = require('./Result')(sequelize, Sequelize.DataTypes);
+const Group = require('./Group')(sequelize, Sequelize.DataTypes);
 
 User.hasMany(Result, { foreignKey: 'userId', as: 'results' });
 Result.belongsTo(User, { foreignKey: 'userId', as: 'user' });
@@ -32,9 +33,17 @@ Result.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 Survey.hasMany(Result, { foreignKey: 'surveyId', as: 'results' });
 Result.belongsTo(Survey, { foreignKey: 'surveyId', as: 'survey' });
 
+if (Group.associate) {
+  Group.associate({ User, Survey, Result, Group });
+}
+if (User.associate) {
+  User.associate({ User, Survey, Result, Group });
+}
+
 module.exports = {
   sequelize,
   User,
   Survey,
-  Result
+  Result,
+  Group
 };

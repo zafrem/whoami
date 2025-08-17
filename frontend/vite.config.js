@@ -11,15 +11,9 @@ export default defineConfig({
   },
   server: {
     port: 8080,
-    host: '0.0.0.0',
+    host: true,
     hmr: {
-      overlay: false,
-      clientPort: 8080,
-      port: 8080
-    },
-    watch: {
-      usePolling: true,
-      interval: 1000
+      overlay: false
     },
     proxy: {
       '/api': {

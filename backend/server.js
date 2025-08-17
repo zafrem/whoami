@@ -10,6 +10,7 @@ const surveyRoutes = require('./routes/surveys');
 const userRoutes = require('./routes/users');
 const resultRoutes = require('./routes/results');
 const adminRoutes = require('./routes/admin');
+const groupRoutes = require('./routes/groups');
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use('/api/surveys', surveyRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/results', resultRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/groups', groupRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });

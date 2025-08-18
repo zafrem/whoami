@@ -163,8 +163,25 @@
           </div>
           <h3 class="text-lg font-semibold text-gray-900">{{ authStore.fullName || authStore.user?.username }}</h3>
           <p class="text-gray-500 text-sm">{{ authStore.user?.email }}</p>
-          <div class="mt-4 text-xs text-gray-400">
-            {{ t('profile.memberSince', { date: formatDate(authStore.user?.createdAt) }) }}
+          <div class="mt-4 space-y-2">
+            <div class="text-xs text-gray-400">
+              {{ t('profile.memberSince', { date: formatDate(authStore.user?.createdAt) }) }}
+            </div>
+            <div v-if="authStore.user?.lastLogin" class="text-xs text-gray-400">
+              <div class="flex items-center justify-center space-x-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Last login: {{ formatDateTime(authStore.user.lastLogin) }}</span>
+              </div>
+              <div v-if="authStore.user?.lastLoginLocation" class="flex items-center justify-center space-x-1 mt-1">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span>{{ formatLoginLocation(authStore.user.lastLoginLocation) }}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -387,6 +404,35 @@ const formatDate = (dateString) => {
     month: 'long',
     day: 'numeric'
   })
+}
+
+const formatDateTime = (dateString) => {
+  if (!dateString) return t('common.unknown')
+  return new Date(dateString).toLocaleString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
+
+const formatLoginLocation = (location) => {
+  if (!location) return 'Unknown location'
+  
+  const parts = []
+  if (location.city && location.city !== 'Unknown') {
+    parts.push(location.city)
+  }
+  if (location.country && location.country !== 'Unknown') {
+    parts.push(location.country)
+  }
+  
+  if (parts.length === 0) {
+    return location.ip ? `IP: ${location.ip}` : 'Unknown location'
+  }
+  
+  return parts.join(', ')
 }
 
 onMounted(async () => {

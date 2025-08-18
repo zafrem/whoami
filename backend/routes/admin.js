@@ -9,7 +9,17 @@ const {
   updateSurvey,
   deleteSurvey,
   getAllUsers,
-  updateUser
+  updateUser,
+  getAllGroups,
+  // LLM Configuration
+  getLLMConfigs,
+  createLLMConfig,
+  updateLLMConfig,
+  deleteLLMConfig,
+  testLLMConfig,
+  // LLM Logs
+  getLLMLogs,
+  getLLMLogDetail
 } = require('../controllers/adminController');
 
 // All admin routes require authentication and admin role
@@ -28,5 +38,19 @@ router.delete('/surveys/:id', deleteSurvey);
 // User management
 router.get('/users', getAllUsers);
 router.put('/users/:id', updateUser);
+
+// Groups management
+router.get('/groups', getAllGroups);
+
+// LLM Configuration management
+router.get('/llm-configs', getLLMConfigs);
+router.post('/llm-configs', createLLMConfig);
+router.put('/llm-configs/:id', updateLLMConfig);
+router.delete('/llm-configs/:id', deleteLLMConfig);
+router.post('/llm-configs/:id/test', testLLMConfig);
+
+// LLM Logs management
+router.get('/llm-logs', getLLMLogs);
+router.get('/llm-logs/:id', getLLMLogDetail);
 
 module.exports = router;

@@ -36,9 +36,27 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      localStorage.removeItem('auth_token')
-      localStorage.removeItem('user')
-      window.location.href = '/login'
+      // Handle token expiration
+      if (error.response?.data?.code === 'TOKEN_EXPIRED') {
+        // Clear auth data
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('user')
+        localStorage.removeItem('login_time')
+        
+        // Show session expired notification if available
+        if (window.showNotification) {
+          window.showNotification('warning', 'Session Expired', 'Your session has expired. Please log in again.')
+        }
+        
+        // Redirect to login
+        window.location.href = '/login'
+      } else {
+        // Other 401 errors
+        localStorage.removeItem('auth_token')
+        localStorage.removeItem('user')
+        localStorage.removeItem('login_time')
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(error)
   }
@@ -47,6 +65,7 @@ api.interceptors.response.use(
 export const authAPI = {
   register: (userData) => api.post('/auth/register', userData),
   login: (credentials) => api.post('/auth/login', credentials),
+  refresh: (userId) => api.post('/auth/refresh', { userId }),
   getProfile: () => api.get('/auth/profile'),
   updateProfile: (userData) => api.put('/auth/profile', userData),
   changePassword: (passwordData) => api.put('/auth/change-password', passwordData)

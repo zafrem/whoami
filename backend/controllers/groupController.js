@@ -1,10 +1,11 @@
 const { Group, User } = require('../models');
 const { Op, col } = require('sequelize');
+const llmService = require('../services/llmService');
 
 const groupController = {
   async createGroup(req, res) {
     try {
-      const { name, description, maxParticipants, matchingType } = req.body;
+      const { name, description, maxParticipants, matchingType, isPublic, publicScope } = req.body;
       
       if (!name || !matchingType) {
         return res.status(400).json({
@@ -12,19 +13,65 @@ const groupController = {
         });
       }
 
-      if (maxParticipants && (maxParticipants < 2 || maxParticipants > 20)) {
+      // Validate participant limits based on matching type
+      if (matchingType === '1:1') {
+        if (maxParticipants && maxParticipants !== 2) {
+          return res.status(400).json({
+            error: '1:1 matching requires exactly 2 participants'
+          });
+        }
+      } else if (matchingType === '1:N') {
+        if (maxParticipants && (maxParticipants < 3 || maxParticipants > 20)) {
+          return res.status(400).json({
+            error: '1:N matching requires between 3 and 20 participants'
+          });
+        }
+      } else {
         return res.status(400).json({
-          error: 'Max participants must be between 2 and 20'
+          error: 'Invalid matching type. Must be "1:1" or "1:N"'
         });
       }
 
+      // Set default maxParticipants based on matching type
+      const defaultMaxParticipants = matchingType === '1:1' ? 2 : 10;
+
+      // Validate public scope if provided
+      let validatedPublicScope = null;
+      if (isPublic && publicScope) {
+        validatedPublicScope = {
+          countries: Array.isArray(publicScope.countries) ? publicScope.countries : [],
+          minAge: publicScope.minAge && !isNaN(publicScope.minAge) ? parseInt(publicScope.minAge) : null,
+          maxAge: publicScope.maxAge && !isNaN(publicScope.maxAge) ? parseInt(publicScope.maxAge) : null,
+          regions: Array.isArray(publicScope.regions) ? publicScope.regions : []
+        };
+
+        // Validate age range
+        if (validatedPublicScope.minAge && (validatedPublicScope.minAge < 13 || validatedPublicScope.minAge > 100)) {
+          return res.status(400).json({
+            error: 'Minimum age must be between 13 and 100'
+          });
+        }
+        if (validatedPublicScope.maxAge && (validatedPublicScope.maxAge < 13 || validatedPublicScope.maxAge > 100)) {
+          return res.status(400).json({
+            error: 'Maximum age must be between 13 and 100'
+          });
+        }
+        if (validatedPublicScope.minAge && validatedPublicScope.maxAge && validatedPublicScope.minAge > validatedPublicScope.maxAge) {
+          return res.status(400).json({
+            error: 'Minimum age cannot be greater than maximum age'
+          });
+        }
+      }
+      
       const group = await Group.create({
         name,
         description,
-        maxParticipants: maxParticipants || 20,
+        maxParticipants: maxParticipants || defaultMaxParticipants,
         matchingType,
         createdBy: req.user.id,
-        currentParticipants: 1
+        currentParticipants: 1,
+        isPublic: isPublic || false,
+        publicScope: validatedPublicScope
       });
 
       await group.addMember(req.user.id);
@@ -38,6 +85,8 @@ const groupController = {
           maxParticipants: group.maxParticipants,
           currentParticipants: group.currentParticipants,
           matchingType: group.matchingType,
+          isPublic: group.isPublic,
+          publicScope: group.publicScope,
           createdAt: group.createdAt
         }
       });
@@ -54,26 +103,92 @@ const groupController = {
       const { page = 1, limit = 12 } = req.query;
       const offset = (page - 1) * limit;
 
+      // Get user info for public scope filtering
+      let userCountry = null;
+      let userAge = null;
+      let userRegion = null;
+
+      if (req.user) {
+        // Get user's current login location
+        if (req.user.lastLoginLocation) {
+          userCountry = req.user.lastLoginLocation.country;
+          userRegion = req.user.lastLoginLocation.city;
+        }
+        
+        // Calculate user's age
+        if (req.user.birthYear) {
+          userAge = new Date().getFullYear() - req.user.birthYear;
+        }
+      }
+
+      // For now, show all groups and handle filtering in application logic
+      // Later we can optimize with more sophisticated database queries
+      const whereConditions = {
+        isActive: true
+      };
+
       const groups = await Group.findAndCountAll({
-        where: {
-          isActive: true
-        },
+        where: whereConditions,
         attributes: [
           'id', 'name', 'description', 'maxParticipants', 
-          'currentParticipants', 'matchingType', 'createdAt'
+          'currentParticipants', 'matchingType', 'createdAt',
+          'isPublic', 'publicScope'
         ],
         order: [['createdAt', 'DESC']],
         limit: parseInt(limit),
         offset: parseInt(offset)
       });
 
+      // Filter groups based on public scope criteria
+      const filteredGroups = groups.rows.filter(group => {
+        // Always show private groups
+        if (!group.isPublic) {
+          return true;
+        }
+
+        // Show public groups without scope restrictions
+        if (!group.publicScope || Object.keys(group.publicScope).length === 0) {
+          return true;
+        }
+
+        // For authenticated users, check public scope criteria
+        if (!req.user) {
+          return true; // Show all public groups to unauthenticated users
+        }
+
+        const scope = group.publicScope;
+        let matches = true;
+
+        // Check country criteria
+        if (scope.countries && scope.countries.length > 0 && userCountry) {
+          matches = matches && scope.countries.includes(userCountry);
+        }
+
+        // Check age criteria
+        if (userAge) {
+          if (scope.minAge && userAge < scope.minAge) {
+            matches = false;
+          }
+          if (scope.maxAge && userAge > scope.maxAge) {
+            matches = false;
+          }
+        }
+
+        // Check region criteria
+        if (scope.regions && scope.regions.length > 0 && userRegion) {
+          matches = matches && scope.regions.includes(userRegion);
+        }
+
+        return matches;
+      });
+
       res.json({
-        groups: groups.rows,
+        groups: filteredGroups,
         pagination: {
-          total: groups.count,
+          total: filteredGroups.length,
           page: parseInt(page),
           limit: parseInt(limit),
-          totalPages: Math.ceil(groups.count / limit)
+          totalPages: Math.ceil(filteredGroups.length / limit)
         }
       });
     } catch (error) {
@@ -301,6 +416,167 @@ const groupController = {
       console.error('Error fetching user groups:', error);
       res.status(500).json({
         error: 'Failed to fetch user groups'
+      });
+    }
+  },
+
+  // New LLM-powered matching functionality
+  async performGroupMatching(req, res) {
+    try {
+      const { id } = req.params;
+
+      const group = await Group.findByPk(id, {
+        include: [{
+          model: User,
+          as: 'members',
+          attributes: ['id', 'userHash']
+        }]
+      });
+
+      if (!group) {
+        return res.status(404).json({
+          error: 'Group not found'
+        });
+      }
+
+      // Check if user is a member or creator
+      const isMemberOrCreator = group.createdBy === req.user.id || 
+        await group.hasMembers([req.user.id]);
+      
+      if (!isMemberOrCreator) {
+        return res.status(403).json({
+          error: 'Only group members can request matching analysis'
+        });
+      }
+
+      // Need at least 2 members for matching
+      if (group.members.length < 2) {
+        return res.status(400).json({
+          error: 'Group needs at least 2 members for matching analysis'
+        });
+      }
+
+      // Extract user hashes for LLM analysis
+      const userHashes = group.members.map(member => member.userHash).filter(hash => hash);
+
+      if (userHashes.length < 2) {
+        return res.status(400).json({
+          error: 'Not enough members with complete profiles for analysis'
+        });
+      }
+
+      // Perform LLM-powered matching analysis
+      const matchingResult = await llmService.performMatching(
+        userHashes,
+        group.matchingType,
+        group.id,
+        req.user.id
+      );
+
+      res.json({
+        message: 'Matching analysis completed successfully',
+        group: {
+          id: group.id,
+          name: group.name,
+          matchingType: group.matchingType,
+          memberCount: group.members.length
+        },
+        analysis: matchingResult.analysis,
+        logId: matchingResult.logId,
+        processingTime: matchingResult.processingTime
+      });
+
+    } catch (error) {
+      console.error('Error performing group matching:', error);
+      res.status(500).json({
+        error: 'Failed to perform matching analysis: ' + error.message
+      });
+    }
+  },
+
+  // Get matching results for a group
+  async getGroupMatchingHistory(req, res) {
+    try {
+      const { id } = req.params;
+
+      const group = await Group.findByPk(id);
+      if (!group) {
+        return res.status(404).json({
+          error: 'Group not found'
+        });
+      }
+
+      // Check if user is a member or creator
+      const isMemberOrCreator = group.createdBy === req.user.id || 
+        await group.hasMembers([req.user.id]);
+      
+      if (!isMemberOrCreator) {
+        return res.status(403).json({
+          error: 'Only group members can view matching history'
+        });
+      }
+
+      const matchingHistory = await llmService.getLogs(50, 0, {
+        groupId: id,
+        operation: 'matching_analysis'
+      });
+
+      res.json({
+        group: {
+          id: group.id,
+          name: group.name
+        },
+        history: matchingHistory.rows,
+        total: matchingHistory.count
+      });
+
+    } catch (error) {
+      console.error('Error getting matching history:', error);
+      res.status(500).json({
+        error: 'Failed to get matching history'
+      });
+    }
+  },
+
+  // Delete group - Admin only functionality
+  async deleteGroup(req, res) {
+    try {
+      const { id } = req.params;
+
+      // Check if user is admin
+      if (req.user.role !== 'admin') {
+        return res.status(403).json({
+          error: 'Only administrators can delete groups'
+        });
+      }
+
+      const group = await Group.findByPk(id);
+
+      if (!group) {
+        return res.status(404).json({
+          error: 'Group not found'
+        });
+      }
+
+      // Log the group deletion for audit purposes
+      console.log(`Admin ${req.user.username} (${req.user.id}) deleting group "${group.name}" (${group.id})`);
+
+      // Delete the group (cascade will handle group members)
+      await group.destroy();
+
+      res.json({
+        message: 'Group deleted successfully',
+        deletedGroup: {
+          id: group.id,
+          name: group.name,
+          matchingType: group.matchingType,
+          maxParticipants: group.maxParticipants
+        }
+      });
+    } catch (error) {
+      console.error('Error deleting group:', error);
+      res.status(500).json({
+        error: 'Failed to delete group'
       });
     }
   }

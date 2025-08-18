@@ -26,6 +26,8 @@ const User = require('./User')(sequelize, Sequelize.DataTypes);
 const Survey = require('./Survey')(sequelize, Sequelize.DataTypes);
 const Result = require('./Result')(sequelize, Sequelize.DataTypes);
 const Group = require('./Group')(sequelize, Sequelize.DataTypes);
+const LLMConfig = require('./LLMConfig')(sequelize, Sequelize.DataTypes);
+const LLMLog = require('./LLMLog')(sequelize, Sequelize.DataTypes);
 
 User.hasMany(Result, { foreignKey: 'userId', as: 'results' });
 Result.belongsTo(User, { foreignKey: 'userId', as: 'user' });
@@ -34,10 +36,13 @@ Survey.hasMany(Result, { foreignKey: 'surveyId', as: 'results' });
 Result.belongsTo(Survey, { foreignKey: 'surveyId', as: 'survey' });
 
 if (Group.associate) {
-  Group.associate({ User, Survey, Result, Group });
+  Group.associate({ User, Survey, Result, Group, LLMConfig, LLMLog });
 }
 if (User.associate) {
-  User.associate({ User, Survey, Result, Group });
+  User.associate({ User, Survey, Result, Group, LLMConfig, LLMLog });
+}
+if (LLMLog.associate) {
+  LLMLog.associate({ User, Survey, Result, Group, LLMConfig, LLMLog });
 }
 
 module.exports = {
@@ -45,5 +50,7 @@ module.exports = {
   User,
   Survey,
   Result,
-  Group
+  Group,
+  LLMConfig,
+  LLMLog
 };

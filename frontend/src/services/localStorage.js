@@ -108,8 +108,21 @@ export const authStorage = {
     storage.remove('user')
   },
 
+  getLoginTime() {
+    return storage.get('login_time')
+  },
+
+  setLoginTime(time) {
+    storage.set('login_time', time)
+  },
+
+  removeLoginTime() {
+    storage.remove('login_time')
+  },
+
   clearAuth() {
     this.removeToken()
     this.removeUser()
+    this.removeLoginTime()
   }
 }

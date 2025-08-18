@@ -12,6 +12,7 @@ const ResultsList = () => import('@/views/ResultsList.vue')
 const ResultCompare = () => import('@/views/ResultCompare.vue')
 const Admin = () => import('@/views/Admin.vue')
 const Groups = () => import('@/views/Groups.vue')
+const ProFeatures = () => import('@/views/ProFeatures.vue')
 
 const routes = [
   {
@@ -88,6 +89,12 @@ const routes = [
     path: '/groups',
     name: 'Groups',
     component: Groups,
+    meta: { requiresAuth: false }
+  },
+  {
+    path: '/pro-features',
+    name: 'ProFeatures',
+    component: ProFeatures,
     meta: { requiresAuth: false }
   },
   {

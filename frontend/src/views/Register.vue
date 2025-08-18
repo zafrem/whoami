@@ -302,12 +302,48 @@ const validateForm = () => {
   return isValid
 }
 
+// Helper function to get GPS location
+const getGPSLocation = () => {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) {
+      console.log('Geolocation not supported by this browser')
+      resolve(null)
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          coords: {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy
+          },
+          timestamp: position.timestamp
+        })
+      },
+      (error) => {
+        console.log('Geolocation error:', error.message)
+        resolve(null)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000 // 5 minutes
+      }
+    )
+  })
+}
+
 const handleSubmit = async () => {
   authStore.clearError()
 
   if (!validateForm()) {
     return
   }
+
+  // Try to get GPS location (non-blocking)
+  const geoLocation = await getGPSLocation()
 
   const userData = {
     username: form.username.trim(),
@@ -325,6 +361,11 @@ const handleSubmit = async () => {
 
   if (form.birthYear) {
     userData.birthYear = parseInt(form.birthYear)
+  }
+
+  // Add GPS location if available
+  if (geoLocation) {
+    userData.geoLocation = geoLocation
   }
 
   const result = await authStore.register(userData)

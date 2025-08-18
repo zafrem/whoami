@@ -22,6 +22,11 @@
               <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm mr-3">1:1</span>
               {{ matchingInfo['1:1'].title }}
             </h3>
+            <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+              <p class="text-sm text-blue-800">
+                <strong>Participants:</strong> Exactly 2 people required for direct one-to-one matching
+              </p>
+            </div>
             
             <div class="mb-4">
               <h4 class="font-medium text-green-700 mb-2">Pros:</h4>
@@ -52,6 +57,11 @@
               <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-sm mr-3">1:N</span>
               {{ matchingInfo['1:N'].title }}
             </h3>
+            <div class="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-4">
+              <p class="text-sm text-orange-800">
+                <strong>Participants:</strong> 3-20 people for comprehensive group analysis and team building
+              </p>
+            </div>
             
             <div class="mb-4">
               <h4 class="font-medium text-green-700 mb-2">Pros:</h4>

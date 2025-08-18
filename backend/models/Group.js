@@ -51,6 +51,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.ENUM('1:1', '1:N'),
       allowNull: false,
       defaultValue: '1:N'
+    },
+    isPublic: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
+    publicScope: {
+      type: DataTypes.JSON,
+      allowNull: true,
+      comment: 'Public scope criteria: { countries: [], minAge: null, maxAge: null, regions: [] }'
     }
   });
 

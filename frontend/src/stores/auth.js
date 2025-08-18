@@ -10,7 +10,10 @@ export const useAuthStore = defineStore('auth', {
     loading: false,
     coldStartLoading: false, // Always start as false
     error: null,
-    requestStartTime: null
+    requestStartTime: null,
+    loginTime: authStorage.getLoginTime(),
+    sessionTimer: null,
+    sessionTimeout: 10 * 60 * 1000 // 10 minutes in milliseconds
   }),
 
   getters: {
@@ -47,9 +50,13 @@ export const useAuthStore = defineStore('auth', {
         this.token = token
         this.user = user
         this.isAuthenticated = true
+        this.loginTime = Date.now()
 
         authStorage.setToken(token)
         authStorage.setUser(user)
+        authStorage.setLoginTime(this.loginTime)
+        
+        this.startSessionTimer()
 
         return { success: true, user }
       } catch (error) {
@@ -86,9 +93,13 @@ export const useAuthStore = defineStore('auth', {
         this.token = token
         this.user = user
         this.isAuthenticated = true
+        this.loginTime = Date.now()
 
         authStorage.setToken(token)
         authStorage.setUser(user)
+        authStorage.setLoginTime(this.loginTime)
+        
+        this.startSessionTimer()
 
         return { success: true, user }
       } catch (error) {
@@ -147,12 +158,64 @@ export const useAuthStore = defineStore('auth', {
     },
 
     logout() {
+      this.clearSessionTimer()
       this.user = null
       this.token = null
       this.isAuthenticated = false
       this.error = null
+      this.loginTime = null
 
       authStorage.clearAuth()
+    },
+
+    startSessionTimer() {
+      this.clearSessionTimer()
+      
+      // Check if session is already expired
+      if (this.loginTime) {
+        const timeElapsed = Date.now() - this.loginTime
+        if (timeElapsed >= this.sessionTimeout) {
+          this.logout()
+          return
+        }
+        
+        // Set timer for remaining time
+        const remainingTime = this.sessionTimeout - timeElapsed
+        this.sessionTimer = setTimeout(() => {
+          this.logout()
+          // Show session expired notification
+          if (window.showNotification) {
+            window.showNotification('warning', 'Session Expired', 'Your session has expired. Please log in again.')
+          }
+        }, remainingTime)
+      }
+    },
+
+    clearSessionTimer() {
+      if (this.sessionTimer) {
+        clearTimeout(this.sessionTimer)
+        this.sessionTimer = null
+      }
+    },
+
+    checkSessionExpiry() {
+      if (this.loginTime) {
+        const timeElapsed = Date.now() - this.loginTime
+        if (timeElapsed >= this.sessionTimeout) {
+          this.logout()
+          return false
+        }
+      }
+      return true
+    },
+
+    initializeSession() {
+      if (this.isAuthenticated && this.loginTime) {
+        if (!this.checkSessionExpiry()) {
+          return
+        }
+        this.startSessionTimer()
+      }
     },
 
     clearError() {

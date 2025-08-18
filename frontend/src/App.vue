@@ -51,6 +51,9 @@ const mainClass = computed(() => ({
 onMounted(() => {
   themeStore.initializeTheme()
   
+  // Initialize session management
+  authStore.initializeSession()
+  
   if (authStore.isAuthenticated && !authStore.user) {
     authStore.fetchProfile()
   }

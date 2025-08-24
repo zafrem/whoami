@@ -77,6 +77,12 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: false,
       field: 'is_external',
       comment: 'Whether this survey is hosted externally'
+    },
+    surveyTypes: {
+      type: DataTypes.JSONB,
+      allowNull: true,
+      field: 'survey_types',
+      comment: 'Survey type configurations: {"simple": {"questions": 10, "time": 3}, "general": {"questions": 20, "time": 7}, "full": {"questions": 30, "time": 10}}'
     }
   }, {
     indexes: [

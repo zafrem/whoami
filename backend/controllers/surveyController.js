@@ -20,7 +20,7 @@ const getAllSurveys = async (req, res) => {
 
     const surveys = await Survey.findAll({
       where,
-      attributes: ['id', 'name', 'description', 'category', 'language', 'estimatedTime', 'difficulty', 'tags', 'baseId'],
+      attributes: ['id', 'name', 'description', 'category', 'language', 'estimatedTime', 'difficulty', 'tags', 'baseId', 'surveyTypes'],
       order: [['createdAt', 'DESC']]
     });
 
@@ -34,7 +34,8 @@ const getAllSurveys = async (req, res) => {
       estimatedTime: survey.estimatedTime,
       difficulty: survey.difficulty,
       tags: survey.tags,
-      baseId: survey.baseId
+      baseId: survey.baseId,
+      surveyTypes: survey.surveyTypes
     }));
 
     res.json(transformedSurveys);
@@ -50,7 +51,7 @@ const getSurvey = async (req, res) => {
     const { includeQuestions = 'false' } = req.query;
     const language = req.headers['accept-language']?.split(',')[0]?.split('-')[0] || 'en';
 
-    const attributes = ['id', 'name', 'description', 'category', 'language', 'estimatedTime', 'difficulty', 'tags', 'baseId', 'isActive'];
+    const attributes = ['id', 'name', 'description', 'category', 'language', 'estimatedTime', 'difficulty', 'tags', 'baseId', 'isActive', 'surveyTypes'];
     if (includeQuestions === 'true') {
       attributes.push('questionsJson', 'analysisJson');
     }
@@ -59,11 +60,11 @@ const getSurvey = async (req, res) => {
       attributes
     });
 
-    if (!survey || !survey.isActive) {
+    if (!survey) {
       return res.status(404).json({ error: 'Survey not found' });
     }
 
-    // Transform survey to include localized content
+    // Transform survey to include localized content and isActive status
     const transformedSurvey = {
       id: survey.id,
       name: survey.getLocalizedName(language),
@@ -73,7 +74,9 @@ const getSurvey = async (req, res) => {
       estimatedTime: survey.estimatedTime,
       difficulty: survey.difficulty,
       tags: survey.tags,
-      baseId: survey.baseId
+      baseId: survey.baseId,
+      isActive: survey.isActive,
+      surveyTypes: survey.surveyTypes
     };
 
     if (includeQuestions === 'true') {
@@ -91,21 +94,43 @@ const getSurvey = async (req, res) => {
 const getSurveyQuestions = async (req, res) => {
   try {
     const { id } = req.params;
+    const { type = 'full' } = req.query; // Default to full survey
     const language = req.headers['accept-language']?.split(',')[0]?.split('-')[0] || 'en';
 
     const survey = await Survey.findByPk(id, {
-      attributes: ['id', 'name', 'language', 'questionsJson', 'isActive']
+      attributes: ['id', 'name', 'language', 'questionsJson', 'surveyTypes', 'isActive']
     });
 
     if (!survey || !survey.isActive) {
       return res.status(404).json({ error: 'Survey not found' });
     }
 
+    let filteredQuestions = survey.questionsJson;
+    let estimatedTime = null;
+    
+    // Filter questions based on survey type if surveyTypes configuration exists
+    if (survey.surveyTypes && survey.surveyTypes[type]) {
+      const typeConfig = survey.surveyTypes[type];
+      const maxQuestions = typeConfig.questions;
+      estimatedTime = typeConfig.time;
+      
+      // Filter questions by priority and limit to maxQuestions
+      if (type === 'simple') {
+        filteredQuestions = survey.questionsJson.filter(q => q.priority === 1).slice(0, maxQuestions);
+      } else if (type === 'general') {
+        filteredQuestions = survey.questionsJson.filter(q => q.priority <= 2).slice(0, maxQuestions);
+      } else if (type === 'full') {
+        filteredQuestions = survey.questionsJson.slice(0, maxQuestions);
+      }
+    }
+
     res.json({
       id: survey.id,
       name: survey.getLocalizedName(language),
       language: survey.language,
-      questions: survey.questionsJson
+      type: type,
+      estimatedTime: estimatedTime,
+      questions: filteredQuestions
     });
   } catch (error) {
     console.error('Get survey questions error:', error);

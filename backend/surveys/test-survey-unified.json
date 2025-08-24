@@ -1,0 +1,550 @@
+{
+  "name": {
+    "en": "Test Survey - Adaptive",
+    "ko": "테스트 설문조사 - 적응형"
+  },
+  "description": {
+    "en": "A flexible personality assessment that adapts to your preferences. Choose from Simple (10 questions, 3 min), General (20 questions, 7 min), or Full (30 questions, 10 min) versions.",
+    "ko": "당신의 선호도에 맞춰 조정되는 유연한 성격 평가입니다. 간단 (10문항, 3분), 일반 (20문항, 7분), 또는 전체 (30문항, 10분) 버전 중에서 선택하세요."
+  },
+  "category": "personality",
+  "language": "en",
+  "baseId": "test-adaptive",
+  "estimatedTime": 7,
+  "difficulty": "medium",
+  "tags": ["test", "personality", "adaptive", "flexible"],
+  "surveyTypes": {
+    "simple": {
+      "questions": 10,
+      "time": 3,
+      "description": "Quick assessment with 10 key questions covering essential traits",
+      "difficulty": "easy"
+    },
+    "general": {
+      "questions": 20,
+      "time": 7,
+      "description": "Balanced assessment with 20 comprehensive questions for deeper insights",
+      "difficulty": "medium"
+    },
+    "full": {
+      "questions": 30,
+      "time": 10,
+      "description": "Complete assessment with all 30 detailed questions for comprehensive analysis",
+      "difficulty": "hard"
+    }
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "text": "I enjoy meeting new people at social gatherings",
+      "type": "scale",
+      "dimension": "social",
+      "priority": 1,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "I prefer to work alone rather than in a team",
+      "type": "scale",
+      "dimension": "work_style",
+      "priority": 1,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "I often think about abstract concepts and ideas",
+      "type": "scale",
+      "dimension": "thinking",
+      "priority": 1,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "I am usually punctual and arrive on time",
+      "type": "scale",
+      "dimension": "organization",
+      "priority": 1,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "I worry about things that might go wrong",
+      "type": "scale",
+      "dimension": "emotional",
+      "priority": 1,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q6",
+      "text": "I enjoy trying new activities and experiences",
+      "type": "scale",
+      "dimension": "openness",
+      "priority": 1,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q7",
+      "text": "I tend to be skeptical of others' motives",
+      "type": "scale",
+      "dimension": "trust",
+      "priority": 1,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q8",
+      "text": "I make decisions quickly without much deliberation",
+      "type": "scale",
+      "dimension": "decision_making",
+      "priority": 1,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q9",
+      "text": "I feel comfortable being the center of attention",
+      "type": "scale",
+      "dimension": "social",
+      "priority": 1,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q10",
+      "text": "I prefer detailed instructions over general guidelines",
+      "type": "scale",
+      "dimension": "work_style",
+      "priority": 1,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q11",
+      "text": "I enjoy philosophical discussions and debates",
+      "type": "scale",
+      "dimension": "thinking",
+      "priority": 2,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q12",
+      "text": "I keep my workspace neat and organized",
+      "type": "scale",
+      "dimension": "organization",
+      "priority": 2,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q13",
+      "text": "I rarely feel anxious or stressed",
+      "type": "scale",
+      "dimension": "emotional",
+      "priority": 2,
+      "options": [
+        { "value": 5, "text": "Strongly Disagree" },
+        { "value": 4, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 2, "text": "Agree" },
+        { "value": 1, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q14",
+      "text": "I am curious about different cultures and viewpoints",
+      "type": "scale",
+      "dimension": "openness",
+      "priority": 2,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q15",
+      "text": "I believe most people are fundamentally good",
+      "type": "scale",
+      "dimension": "trust",
+      "priority": 2,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q16",
+      "text": "I analyze all options before making important decisions",
+      "type": "scale",
+      "dimension": "decision_making",
+      "priority": 2,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q17",
+      "text": "I energize others with my enthusiasm",
+      "type": "scale",
+      "dimension": "social",
+      "priority": 2,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q18",
+      "text": "I work best when I can set my own schedule",
+      "type": "scale",
+      "dimension": "work_style",
+      "priority": 2,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q19",
+      "text": "I prefer practical solutions over theoretical ones",
+      "type": "scale",
+      "dimension": "thinking",
+      "priority": 2,
+      "options": [
+        { "value": 5, "text": "Strongly Disagree" },
+        { "value": 4, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 2, "text": "Agree" },
+        { "value": 1, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q20",
+      "text": "I create detailed plans before starting projects",
+      "type": "scale",
+      "dimension": "organization",
+      "priority": 2,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q21",
+      "text": "I handle criticism well without getting upset",
+      "type": "scale",
+      "dimension": "emotional",
+      "priority": 3,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q22",
+      "text": "I enjoy exploring new ideas and possibilities",
+      "type": "scale",
+      "dimension": "openness",
+      "priority": 3,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q23",
+      "text": "I am quick to forgive others for their mistakes",
+      "type": "scale",
+      "dimension": "trust",
+      "priority": 3,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q24",
+      "text": "I trust my gut feelings when making choices",
+      "type": "scale",
+      "dimension": "decision_making",
+      "priority": 3,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q25",
+      "text": "I prefer small gatherings over large parties",
+      "type": "scale",
+      "dimension": "social",
+      "priority": 3,
+      "options": [
+        { "value": 5, "text": "Strongly Disagree" },
+        { "value": 4, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 2, "text": "Agree" },
+        { "value": 1, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q26",
+      "text": "I thrive in collaborative work environments",
+      "type": "scale",
+      "dimension": "work_style",
+      "priority": 3,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q27",
+      "text": "I enjoy learning about complex theories and concepts",
+      "type": "scale",
+      "dimension": "thinking",
+      "priority": 3,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q28",
+      "text": "I follow through on my commitments consistently",
+      "type": "scale",
+      "dimension": "organization",
+      "priority": 3,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q29",
+      "text": "I maintain emotional stability during challenging times",
+      "type": "scale",
+      "dimension": "emotional",
+      "priority": 3,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    },
+    {
+      "id": "q30",
+      "text": "I am open to changing my opinions when presented with new evidence",
+      "type": "scale",
+      "dimension": "openness",
+      "priority": 3,
+      "options": [
+        { "value": 1, "text": "Strongly Disagree" },
+        { "value": 2, "text": "Disagree" },
+        { "value": 3, "text": "Neutral" },
+        { "value": 4, "text": "Agree" },
+        { "value": 5, "text": "Strongly Agree" }
+      ]
+    }
+  ],
+  "analysis": {
+    "dimensions": [
+      {
+        "key": "social",
+        "name": "Social Engagement",
+        "questions": ["q1", "q9", "q17", "q25"],
+        "scoring": {
+          "1": 0, "2": 25, "3": 50, "4": 75, "5": 100
+        }
+      },
+      {
+        "key": "work_style",
+        "name": "Work Style Preferences",
+        "questions": ["q2", "q10", "q18", "q26"],
+        "scoring": {
+          "1": 0, "2": 25, "3": 50, "4": 75, "5": 100
+        }
+      },
+      {
+        "key": "thinking",
+        "name": "Thinking Approach",
+        "questions": ["q3", "q11", "q19", "q27"],
+        "scoring": {
+          "1": 0, "2": 25, "3": 50, "4": 75, "5": 100
+        }
+      },
+      {
+        "key": "organization",
+        "name": "Organization & Planning",
+        "questions": ["q4", "q12", "q20", "q28"],
+        "scoring": {
+          "1": 0, "2": 25, "3": 50, "4": 75, "5": 100
+        }
+      },
+      {
+        "key": "emotional",
+        "name": "Emotional Stability",
+        "questions": ["q5", "q13", "q21", "q29"],
+        "scoring": {
+          "1": 0, "2": 25, "3": 50, "4": 75, "5": 100
+        }
+      },
+      {
+        "key": "openness",
+        "name": "Openness to Experience",
+        "questions": ["q6", "q14", "q22", "q30"],
+        "scoring": {
+          "1": 0, "2": 25, "3": 50, "4": 75, "5": 100
+        }
+      },
+      {
+        "key": "trust",
+        "name": "Trust & Cooperation",
+        "questions": ["q7", "q15", "q23"],
+        "scoring": {
+          "1": 0, "2": 25, "3": 50, "4": 75, "5": 100
+        }
+      },
+      {
+        "key": "decision_making",
+        "name": "Decision Making Style",
+        "questions": ["q8", "q16", "q24"],
+        "scoring": {
+          "1": 0, "2": 25, "3": 50, "4": 75, "5": 100
+        }
+      }
+    ],
+    "resultTypes": [
+      {
+        "dimension": "social",
+        "categories": [
+          {
+            "key": "introverted",
+            "min": 0,
+            "max": 49,
+            "description": "You tend to be more reserved and prefer smaller social circles.",
+            "traits": ["reflective", "thoughtful", "independent", "focused"]
+          },
+          {
+            "key": "extraverted",
+            "min": 50,
+            "max": 100,
+            "description": "You are outgoing and energized by social interactions.",
+            "traits": ["outgoing", "energetic", "sociable", "expressive"]
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "text": "This adaptive assessment evaluates your preferences across multiple dimensions. Choose your preferred survey length for the level of detail you want."
+    }
+  }
+}

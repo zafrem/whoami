@@ -60,6 +60,57 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.JSON,
       allowNull: true,
       comment: 'Public scope criteria: { countries: [], minAge: null, maxAge: null, regions: [] }'
+    },
+    retentionHours: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      validate: {
+        min: 1,
+        max: 336 // 2 weeks max (14 days * 24 hours)
+      },
+      comment: 'Hours after creation when group becomes creator-only'
+    },
+    expiresAt: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: 'Calculated expiration timestamp based on retentionHours'
+    }
+  });
+
+  // Instance methods
+  Group.prototype.isExpired = function() {
+    return this.expiresAt && new Date() > this.expiresAt;
+  };
+
+  Group.prototype.canUserAccess = function(userId) {
+    // If no retention time set, always accessible
+    if (!this.retentionHours || !this.expiresAt) {
+      return true;
+    }
+    
+    // If not expired, accessible to all members
+    if (!this.isExpired()) {
+      return true;
+    }
+    
+    // If expired, only creator can access
+    return this.createdBy === userId;
+  };
+
+  // Hook to calculate expiresAt when retentionHours is set
+  Group.beforeCreate((group) => {
+    if (group.retentionHours) {
+      const expirationDate = new Date();
+      expirationDate.setHours(expirationDate.getHours() + group.retentionHours);
+      group.expiresAt = expirationDate;
+    }
+  });
+
+  Group.beforeUpdate((group) => {
+    if (group.changed('retentionHours') && group.retentionHours) {
+      const expirationDate = new Date();
+      expirationDate.setHours(expirationDate.getHours() + group.retentionHours);
+      group.expiresAt = expirationDate;
     }
   });
 
@@ -72,6 +123,10 @@ module.exports = (sequelize, DataTypes) => {
       through: 'GroupMembers',
       as: 'members',
       foreignKey: 'groupId'
+    });
+    Group.hasMany(models.GroupComment, {
+      foreignKey: 'groupId',
+      as: 'comments'
     });
   };
 

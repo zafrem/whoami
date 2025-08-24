@@ -74,7 +74,7 @@ export const authAPI = {
 export const surveyAPI = {
   getAll: (params) => api.get('/surveys', { params }),
   getById: (id, params) => api.get(`/surveys/${id}`, { params }),
-  getQuestions: (id) => api.get(`/surveys/${id}/questions`),
+  getQuestions: (id, type = 'full') => api.get(`/surveys/${id}/questions`, { params: { type } }),
   getStats: (id) => api.get(`/surveys/${id}/stats`),
   create: (surveyData) => api.post('/surveys', surveyData),
   update: (id, surveyData) => api.put(`/surveys/${id}`, surveyData),

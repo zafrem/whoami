@@ -59,8 +59,17 @@
     <div v-else-if="currentSurvey && currentQuestions">
       <!-- Survey Header -->
       <div :class="props.embedded ? 'mb-4' : 'mb-8'">
-        <h1 :class="props.embedded ? 'text-xl font-bold text-gray-900 mb-2' : 'text-3xl font-bold text-gray-900 mb-2'">{{ getLocalizedText(currentSurvey.name) }}</h1>
+        <div class="flex items-center justify-between mb-2">
+          <h1 :class="props.embedded ? 'text-xl font-bold text-gray-900' : 'text-3xl font-bold text-gray-900'">{{ getLocalizedText(currentSurvey.name) }}</h1>
+          <span v-if="currentQuestions?.type && currentQuestions.type !== 'full'" class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-primary-100 text-primary-800 capitalize">
+            {{ currentQuestions.type }} ({{ currentQuestions.questions?.length }} questions)
+          </span>
+        </div>
         <p class="text-gray-600 mb-4">{{ getLocalizedText(currentSurvey.description) }}</p>
+        <div v-if="currentQuestions?.estimatedTime" class="flex items-center text-sm text-gray-500 mb-4">
+          <ClockIcon class="w-4 h-4 mr-1" />
+          <span>Estimated time: {{ currentQuestions.estimatedTime }} minutes</span>
+        </div>
         
         <!-- Progress Bar -->
         <div class="mb-6">
@@ -83,15 +92,47 @@
 
       <!-- Question Navigation -->
       <div v-if="totalQuestions > 1 && !props.embedded" class="mb-6">
-        <div class="flex flex-wrap gap-2">
+        <div class="flex items-center gap-2">
+          <!-- Left Arrow -->
           <button
-            v-for="(question, index) in currentQuestions.questions"
-            :key="question.id"
-            @click="goToQuestion(index)"
-            class="w-10 h-10 rounded-lg border-2 text-sm font-medium transition-colors"
-            :class="getQuestionNavClass(index)"
+            v-if="totalQuestions > 10 && navWindowStart > 0"
+            @click="scrollNavLeft"
+            class="w-8 h-8 rounded-lg border-2 border-gray-300 bg-white text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center"
           >
-            {{ index + 1 }}
+            <ArrowLeftIcon class="w-4 h-4" />
+          </button>
+          
+          <!-- Question Numbers -->
+          <div class="flex gap-2 overflow-hidden">
+            <button
+              v-for="questionIndex in visibleQuestionNumbers"
+              :key="questionIndex"
+              @click="goToQuestion(questionIndex)"
+              class="w-10 h-10 rounded-lg border-2 text-sm font-medium transition-colors flex-shrink-0"
+              :class="getQuestionNavClass(questionIndex)"
+            >
+              {{ questionIndex + 1 }}
+            </button>
+          </div>
+          
+          <!-- Right Arrow -->
+          <button
+            v-if="totalQuestions > 10 && navWindowStart + 10 < totalQuestions"
+            @click="scrollNavRight"
+            class="w-8 h-8 rounded-lg border-2 border-gray-300 bg-white text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors flex items-center justify-center"
+          >
+            <ArrowRightIcon class="w-4 h-4" />
+          </button>
+        </div>
+        
+        <!-- Reset Button -->
+        <div v-if="Object.keys(surveyStore.currentProgress.answers).length > 0" class="mt-4 flex justify-end">
+          <button
+            @click="showResetModal = true"
+            class="text-red-600 hover:text-red-700 text-sm font-medium flex items-center"
+          >
+            <TrashIcon class="w-4 h-4 mr-1" />
+            Reset All Answers
           </button>
         </div>
       </div>
@@ -232,6 +273,37 @@
         </div>
       </div>
     </div>
+
+    <!-- Reset Confirmation Modal -->
+    <div v-if="showResetModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-lg max-w-md w-full p-6">
+        <div class="flex items-center mb-4">
+          <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
+            <TrashIcon class="h-6 w-6 text-red-600" />
+          </div>
+        </div>
+        <div class="text-center">
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Reset All Answers</h3>
+          <p class="text-sm text-gray-500 mb-6">
+            Are you sure you want to reset all your answers? This action cannot be undone and you will lose all progress.
+          </p>
+          <div class="flex space-x-3">
+            <button
+              @click="showResetModal = false"
+              class="flex-1 btn-secondary"
+            >
+              Cancel
+            </button>
+            <button
+              @click="confirmReset"
+              class="flex-1 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition-colors"
+            >
+              Reset All
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -239,7 +311,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { ArrowLeftIcon, ArrowRightIcon, CheckIcon } from '@heroicons/vue/24/outline'
+import { ArrowLeftIcon, ArrowRightIcon, CheckIcon, ClockIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import { useAuthStore } from '@/stores/auth'
 import { useSurveyStore } from '@/stores/survey'
 
@@ -261,12 +333,46 @@ const authStore = useAuthStore()
 const surveyStore = useSurveyStore()
 
 const showRegistrationPrompt = ref(false)
+const showResetModal = ref(false)
 const timeInterval = ref(null)
 
 const currentSurvey = computed(() => surveyStore.currentSurvey)
 const currentQuestions = computed(() => surveyStore.currentQuestions)
 const currentQuestionIndex = computed(() => surveyStore.currentProgress.currentQuestion)
 const totalQuestions = computed(() => currentQuestions.value?.questions?.length || 0)
+
+// Navigation window for question numbers
+const navWindowStart = ref(0)
+const navWindowSize = 10
+
+const visibleQuestionNumbers = computed(() => {
+  const total = totalQuestions.value
+  if (total <= navWindowSize) {
+    // Show all questions if 10 or fewer
+    return Array.from({ length: total }, (_, i) => i)
+  } else {
+    // Show sliding window of 10 questions
+    const start = navWindowStart.value
+    const end = Math.min(start + navWindowSize, total)
+    return Array.from({ length: end - start }, (_, i) => start + i)
+  }
+})
+
+// Auto-adjust navigation window to keep current question visible
+watch(currentQuestionIndex, (newIndex) => {
+  const total = totalQuestions.value
+  if (total > navWindowSize) {
+    const windowStart = navWindowStart.value
+    const windowEnd = windowStart + navWindowSize - 1
+    
+    // If current question is outside the visible window, adjust the window
+    if (newIndex < windowStart) {
+      navWindowStart.value = Math.max(0, newIndex)
+    } else if (newIndex > windowEnd) {
+      navWindowStart.value = Math.min(total - navWindowSize, newIndex - navWindowSize + 1)
+    }
+  }
+})
 
 const currentQuestion = computed(() => {
   if (!currentQuestions.value?.questions) return null
@@ -304,6 +410,17 @@ const loadSurvey = async () => {
     // First try to load the survey as requested
     await surveyStore.fetchSurvey(props.id)
     
+    // Check if user is trying to access an inactive survey
+    // Exception: Adaptive surveys (baseId: "test-adaptive") can be accessed even if inactive
+    const isAdaptiveSurvey = surveyStore.currentSurvey?.baseId === 'test-adaptive'
+    
+    if (!surveyStore.currentSurvey?.isActive && !isAdaptiveSurvey) {
+      // Redirect to survey list if trying to access inactive survey (except adaptive surveys)
+      console.log('Redirecting to survey list - survey is inactive')
+      router.replace({ name: 'SurveyList' })
+      return
+    }
+    
     // If successful and we have a baseId, check if there's a version in the current language
     if (surveyStore.currentSurvey?.baseId) {
       const currentLanguage = locale.value
@@ -316,17 +433,24 @@ const loadSurvey = async () => {
         )
         
         if (languageSpecificSurvey && languageSpecificSurvey.id !== props.id) {
-          // Redirect to the correct language version
-          router.replace({ name: 'SurveyTake', params: { id: languageSpecificSurvey.id } })
+          // Redirect to the correct language version with type parameter
+          const newRoute = { name: 'SurveyTake', params: { id: languageSpecificSurvey.id } }
+          if (route.query.type) {
+            newRoute.query = { type: route.query.type }
+          }
+          router.replace(newRoute)
           return
         }
       }
     }
     
-    // Load the questions for the survey
-    await surveyStore.fetchSurveyQuestions(props.id)
+    // Load the questions for the survey with type filter if specified
+    const surveyType = route.query.type || 'full'
+    await surveyStore.fetchSurveyQuestions(props.id, surveyType)
   } catch (error) {
     console.error('Failed to load survey:', error)
+    // Redirect to survey list on error
+    router.replace({ name: 'SurveyList' })
   }
 }
 
@@ -350,6 +474,28 @@ const previousQuestion = () => {
 
 const goToQuestion = (index) => {
   surveyStore.goToQuestion(index)
+}
+
+const scrollNavLeft = () => {
+  navWindowStart.value = Math.max(0, navWindowStart.value - navWindowSize)
+}
+
+const scrollNavRight = () => {
+  const total = totalQuestions.value
+  navWindowStart.value = Math.min(total - navWindowSize, navWindowStart.value + navWindowSize)
+}
+
+const confirmReset = () => {
+  surveyStore.resetAnswers()
+  showResetModal.value = false
+  
+  // Reset navigation window to start
+  navWindowStart.value = 0
+  
+  // Show notification if available
+  if (window.showNotification) {
+    window.showNotification('success', 'Reset Complete', 'All answers have been cleared.')
+  }
 }
 
 const submitSurvey = async () => {

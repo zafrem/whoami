@@ -7,33 +7,47 @@
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "vercel-build": "npm run build"
+    "vercel-build": "npm run build",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:run": "vitest run"
   },
   "dependencies": {
-    "vue": "^3.3.4",
-    "vue-router": "^4.2.4",
-    "pinia": "^2.1.6",
-    "axios": "^1.4.0",
-    "vue-i18n": "^9.2.2",
-    "chart.js": "^4.3.0",
-    "vue-chartjs": "^5.2.0",
     "@headlessui/vue": "^1.7.14",
     "@heroicons/vue": "^2.0.18",
+    "axios": "^1.4.0",
+    "chart.js": "^4.3.0",
+    "html2canvas": "^1.4.1",
     "jspdf": "^2.5.1",
-    "html2canvas": "^1.4.1"
+    "pinia": "^2.1.6",
+    "vue": "^3.3.4",
+    "vue-chartjs": "^5.2.0",
+    "vue-i18n": "^9.2.2",
+    "vue-router": "^4.2.4"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/vue": "^8.1.0",
     "@vitejs/plugin-vue": "^4.2.3",
-    "vite": "^4.4.5",
+    "@vitest/ui": "^3.2.4",
+    "@vue/eslint-config-prettier": "^8.0.0",
+    "@vue/test-utils": "^2.4.6",
+    "autoprefixer": "^10.4.14",
     "eslint": "^8.45.0",
     "eslint-plugin-vue": "^9.15.1",
-    "@vue/eslint-config-prettier": "^8.0.0",
-    "prettier": "^3.0.0",
-    "autoprefixer": "^10.4.14",
+    "jsdom": "^26.1.0",
     "postcss": "^8.4.27",
-    "tailwindcss": "^3.3.0"
+    "prettier": "^3.0.0",
+    "tailwindcss": "^3.3.0",
+    "vite": "^4.4.5",
+    "vitest": "^3.2.4"
   },
-  "keywords": ["personality", "survey", "vue", "frontend"],
+  "keywords": [
+    "personality",
+    "survey",
+    "vue",
+    "frontend"
+  ],
   "author": "Your Name",
   "license": "MIT"
 }

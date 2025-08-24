@@ -87,9 +87,38 @@
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            <tr v-for="survey in surveys" :key="survey.id">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm font-medium text-gray-900">{{ getLocalizedText(survey.name) }}</div>
+            <tr v-for="survey in surveys" :key="survey.id" :class="survey.level > 0 ? 'bg-gray-50' : ''">
+              <td class="py-4 whitespace-nowrap" :class="survey.level === 0 ? 'px-6' : 'px-4'">
+                <div class="flex items-center">
+                  <!-- Tree structure indicators -->
+                  <div v-if="survey.level > 0" class="flex items-center mr-3">
+                    <div class="w-4 h-px bg-gray-300"></div>
+                    <div class="w-2 h-2 border-l border-b border-gray-300 rounded-bl"></div>
+                  </div>
+                  <!-- Adaptive survey icon -->
+                  <div v-if="survey.isAdaptive" class="mr-2">
+                    <div class="w-5 h-5 bg-blue-100 rounded-full flex items-center justify-center">
+                      <svg class="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h4a1 1 0 010 2H6.414l2.293 2.293a1 1 0 01.293.707v6.586l-2-2V9.414L3.707 6.121A1 1 0 013 5.414V4zm8 0a1 1 0 011-1h4a1 1 0 110 2h-1.586l-2.293 2.293a1 1 0 00-.293.707v6.586l2-2V9.414l3.293-3.293A1 1 0 0117 5.414V4a1 1 0 00-1-1h-4a1 1 0 00-1 1z" clip-rule="evenodd" />
+                      </svg>
+                    </div>
+                  </div>
+                  <!-- Survey name -->
+                  <div class="text-sm font-medium text-gray-900" :class="survey.level > 0 ? 'text-gray-700' : ''">
+                    {{ getLocalizedText(survey.name) }}
+                  </div>
+                  <!-- Type badge for adaptive surveys and their children -->
+                  <div v-if="survey.isAdaptive" class="ml-2">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                      Adaptive
+                    </span>
+                  </div>
+                  <div v-else-if="survey.isAdaptiveChild" class="ml-2">
+                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-600 border border-blue-200">
+                      Test Variant
+                    </span>
+                  </div>
+                </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ survey.category }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ survey.language }}</td>
@@ -111,6 +140,20 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                 <div class="flex flex-wrap gap-2">
+                  <button
+                    @click="toggleSurveyStatus(survey)"
+                    :class="survey.isActive ? 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200' : 'bg-green-100 text-green-800 hover:bg-green-200'"
+                    class="inline-flex items-center px-2 py-1 text-xs rounded"
+                    :title="survey.isActive ? 'Deactivate survey - users cannot access' : 'Activate survey - users can access'"
+                  >
+                    <svg v-if="survey.isActive" class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L5.636 5.636"></path>
+                    </svg>
+                    <svg v-else class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    {{ survey.isActive ? 'Deactivate' : 'Activate' }}
+                  </button>
                   <button
                     @click="copyIframeLink(survey)"
                     class="inline-flex items-center px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded hover:bg-blue-200"
@@ -774,21 +817,72 @@
                 </select>
               </div>
             </div>
-            <div>
-              <label class="flex items-center">
-                <input v-model="newSurvey.isExternal" type="checkbox" class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
-                <span class="ml-2 text-sm text-gray-700">External Survey</span>
-              </label>
+            <!-- Survey Type Options -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="flex items-center">
+                  <input v-model="newSurvey.isExternal" type="checkbox" class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50" :disabled="newSurvey.isAdaptive">
+                  <span class="ml-2 text-sm text-gray-700">External Survey</span>
+                </label>
+              </div>
+              <div>
+                <label class="flex items-center">
+                  <input v-model="newSurvey.isAdaptive" type="checkbox" class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50" :disabled="newSurvey.isExternal">
+                  <span class="ml-2 text-sm text-gray-700">Adaptive Survey</span>
+                </label>
+              </div>
             </div>
-            <div v-if="newSurvey.isExternal">
+
+            <!-- External Survey URL -->
+            <div v-if="newSurvey.isExternal && !newSurvey.isAdaptive">
               <label class="block text-sm font-medium text-gray-700">External URL</label>
               <input v-model="newSurvey.externalUrl" type="url" required class="mt-1 form-input" />
             </div>
-            <div v-else>
+
+            <!-- Adaptive Survey Selection -->
+            <div v-else-if="newSurvey.isAdaptive && !newSurvey.isExternal">
+              <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <h4 class="text-sm font-medium text-blue-900 mb-2">🔄 Adaptive Survey Configuration</h4>
+                <p class="text-xs text-blue-700 mb-3">Select 3 existing surveys to use as Simple, General, and Full variants for this adaptive survey.</p>
+              </div>
+              
+              <div class="grid grid-cols-1 gap-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Simple Survey (10 questions)</label>
+                  <select v-model="newSurvey.simpleSurveyId" required class="mt-1 form-input">
+                    <option value="">Select a survey for Simple variant</option>
+                    <option v-for="survey in availableSurveysForAdaptive" :key="survey.id" :value="survey.id">
+                      {{ getLocalizedText(survey.name) }}
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">General Survey (20 questions)</label>
+                  <select v-model="newSurvey.generalSurveyId" required class="mt-1 form-input">
+                    <option value="">Select a survey for General variant</option>
+                    <option v-for="survey in availableSurveysForAdaptive" :key="survey.id" :value="survey.id">
+                      {{ getLocalizedText(survey.name) }}
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700">Full Survey (30 questions)</label>
+                  <select v-model="newSurvey.fullSurveyId" required class="mt-1 form-input">
+                    <option value="">Select a survey for Full variant</option>
+                    <option v-for="survey in availableSurveysForAdaptive" :key="survey.id" :value="survey.id">
+                      {{ getLocalizedText(survey.name) }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Regular Survey Questions -->
+            <div v-else-if="!newSurvey.isExternal && !newSurvey.isAdaptive">
               <label class="block text-sm font-medium text-gray-700">Questions JSON</label>
-              <textarea v-model="newSurvey.questionsJson" rows="6" required class="mt-1 form-input" placeholder='{"questions": [...]}' style="font-family: monospace;"></textarea>
+              <textarea v-model="newSurvey.questionsJson" rows="6" required class="mt-1 form-input" :placeholder="questionsJsonPlaceholder" style="font-family: monospace;"></textarea>
               <label class="block text-sm font-medium text-gray-700 mt-4">Analysis JSON</label>
-              <textarea v-model="newSurvey.analysisJson" rows="4" required class="mt-1 form-input" placeholder='{"analysis": {...}}' style="font-family: monospace;"></textarea>
+              <textarea v-model="newSurvey.analysisJson" rows="4" required class="mt-1 form-input" :placeholder="analysisJsonPlaceholder" style="font-family: monospace;"></textarea>
             </div>
             <div class="flex space-x-3 pt-4">
               <button type="submit" class="btn-primary">Create Survey</button>
@@ -1153,7 +1247,11 @@ const newSurvey = ref({
   isExternal: false,
   externalUrl: '',
   questionsJson: '',
-  analysisJson: ''
+  analysisJson: '',
+  isAdaptive: false,
+  simpleSurveyId: '',
+  generalSurveyId: '',
+  fullSurveyId: ''
 })
 
 const newLLMConfig = ref({
@@ -1181,6 +1279,46 @@ const iframeCode = computed(() => {
   if (!selectedSurvey.value) return ''
   const fullscreenAttr = embedOptions.value.allowFullscreen ? ' allowfullscreen' : ''
   return `<iframe src="${embedUrl.value}" width="${embedOptions.value.width}" height="${embedOptions.value.height}" frameborder="0"${fullscreenAttr}></iframe>`
+})
+
+const availableSurveysForAdaptive = computed(() => {
+  // Filter out adaptive surveys and only show non-adaptive internal surveys
+  return surveys.value.filter(s => !s.isAdaptive && !s.isExternal && s.isActive)
+})
+
+const questionsJsonPlaceholder = computed(() => {
+  return `[
+  {
+    "id": "q1",
+    "type": "likert",
+    "text": "I enjoy meeting new people",
+    "scale": 5,
+    "priority": 1
+  },
+  {
+    "id": "q2", 
+    "type": "likert",
+    "text": "I prefer to work alone rather than in groups",
+    "scale": 5,
+    "priority": 2
+  }
+]`
+})
+
+const analysisJsonPlaceholder = computed(() => {
+  return `{
+  "dimensions": [
+    {
+      "name": "Extroversion",
+      "questions": ["q1", "q2"],
+      "weights": [1, -1]
+    }
+  ],
+  "interpretations": {
+    "high": "You are highly extroverted",
+    "low": "You are more introverted"
+  }
+}`
 })
 
 // Check admin access
@@ -1218,7 +1356,33 @@ const loadDashboard = async () => {
 const loadSurveys = async () => {
   try {
     const response = await api.get('/admin/surveys')
-    surveys.value = response.data.surveys
+    const allSurveys = response.data.surveys
+    
+    // Group surveys hierarchically: 
+    // - Adaptive surveys (test-adaptive) at top level
+    // - Surveys that belong to adaptive system (test-* variants) indented below
+    // - All other unrelated surveys at top level
+    
+    const adaptiveSurveys = allSurveys.filter(s => s.baseId === 'test-adaptive')
+    const adaptiveVariants = allSurveys.filter(s => 
+      s.baseId && s.baseId.startsWith('test-') && s.baseId !== 'test-adaptive'
+    )
+    const otherSurveys = allSurveys.filter(s => 
+      s.baseId !== 'test-adaptive' && 
+      (!s.baseId || !s.baseId.startsWith('test-'))
+    )
+    
+    // Create hierarchical structure
+    const hierarchicalSurveys = [
+      // Adaptive surveys at top level
+      ...adaptiveSurveys.map(s => ({ ...s, isAdaptive: true, level: 0 })),
+      // Test variants indented under adaptive
+      ...adaptiveVariants.map(s => ({ ...s, isAdaptive: false, level: 1, isAdaptiveChild: true })),
+      // Other surveys at top level
+      ...otherSurveys.map(s => ({ ...s, isAdaptive: false, level: 0 }))
+    ]
+    
+    surveys.value = hierarchicalSurveys
   } catch (error) {
     console.error('Failed to load surveys:', error)
   }
@@ -1247,9 +1411,28 @@ const createSurvey = async () => {
       category: newSurvey.value.category,
       language: newSurvey.value.language,
       isExternal: newSurvey.value.isExternal,
-      externalUrl: newSurvey.value.isExternal ? newSurvey.value.externalUrl : null,
-      questionsJson: newSurvey.value.isExternal ? {} : JSON.parse(newSurvey.value.questionsJson),
-      analysisJson: newSurvey.value.isExternal ? {} : JSON.parse(newSurvey.value.analysisJson)
+      isAdaptive: newSurvey.value.isAdaptive
+    }
+
+    // Handle different survey types
+    if (newSurvey.value.isAdaptive) {
+      // Adaptive survey - use selected surveys to create configuration
+      surveyData.adaptiveConfig = {
+        simpleSurveyId: newSurvey.value.simpleSurveyId,
+        generalSurveyId: newSurvey.value.generalSurveyId,
+        fullSurveyId: newSurvey.value.fullSurveyId
+      }
+      surveyData.questionsJson = {}
+      surveyData.analysisJson = {}
+    } else if (newSurvey.value.isExternal) {
+      // External survey
+      surveyData.externalUrl = newSurvey.value.externalUrl
+      surveyData.questionsJson = {}
+      surveyData.analysisJson = {}
+    } else {
+      // Regular survey
+      surveyData.questionsJson = JSON.parse(newSurvey.value.questionsJson)
+      surveyData.analysisJson = JSON.parse(newSurvey.value.analysisJson)
     }
 
     await api.post('/admin/surveys', surveyData)
@@ -1259,7 +1442,8 @@ const createSurvey = async () => {
     window.showNotification('success', 'Success', 'Survey created successfully')
   } catch (error) {
     console.error('Failed to create survey:', error)
-    window.showNotification('error', 'Error', 'Failed to create survey')
+    const message = error.response?.data?.error || 'Failed to create survey'
+    window.showNotification('error', 'Error', message)
   }
 }
 
@@ -1273,6 +1457,31 @@ const deleteSurvey = async (survey) => {
       console.error('Failed to delete survey:', error)
       window.showNotification('error', 'Error', 'Failed to delete survey')
     }
+  }
+}
+
+const toggleSurveyStatus = async (survey) => {
+  try {
+    const newStatus = !survey.isActive
+    const action = newStatus ? 'activate' : 'deactivate'
+    const surveyName = getLocalizedText(survey.name)
+    
+    if (!confirm(`Are you sure you want to ${action} "${surveyName}"?\n\n${newStatus ? 'Users will be able to access and take this survey.' : 'Users will not be able to access or take this survey.'}`)) {
+      return
+    }
+    
+    await api.put(`/admin/surveys/${survey.id}`, {
+      isActive: newStatus
+    })
+    
+    // Update local state
+    survey.isActive = newStatus
+    
+    window.showNotification('success', 'Success', `Survey "${surveyName}" ${newStatus ? 'activated' : 'deactivated'} successfully`)
+  } catch (error) {
+    console.error('Failed to toggle survey status:', error)
+    const message = error.response?.data?.error || 'Failed to update survey status'
+    window.showNotification('error', 'Error', message)
   }
 }
 
@@ -1330,7 +1539,11 @@ const resetNewSurvey = () => {
     isExternal: false,
     externalUrl: '',
     questionsJson: '',
-    analysisJson: ''
+    analysisJson: '',
+    isAdaptive: false,
+    simpleSurveyId: '',
+    generalSurveyId: '',
+    fullSurveyId: ''
   }
 }
 

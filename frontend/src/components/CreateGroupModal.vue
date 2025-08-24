@@ -90,6 +90,31 @@
               </p>
             </div>
 
+            <!-- Retention Time -->
+            <div class="mb-4">
+              <label for="retentionHours" class="block text-sm font-medium text-gray-700 mb-1">
+                Retention Time (optional)
+              </label>
+              <div class="flex gap-2">
+                <input
+                  id="retentionHours"
+                  v-model.number="form.retentionHours"
+                  type="number"
+                  min="1"
+                  max="336"
+                  class="flex-1 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  placeholder="e.g., 24"
+                >
+                <span class="flex items-center text-sm text-gray-600 px-2">hours</span>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">
+                After this time expires, only you (the creator) will be able to see the group. Leave empty for permanent visibility.
+              </p>
+              <div class="text-xs text-gray-400 mt-1">
+                <span class="font-medium">Examples:</span> 24h (1 day), 168h (1 week), 336h (2 weeks max)
+              </div>
+            </div>
+
             <!-- Public Scope Toggle -->
             <div class="mb-6 border-t pt-4">
               <div class="flex items-center justify-between">
@@ -251,6 +276,7 @@ const form = ref({
   maxParticipants: 10,
   matchingType: '1:N',
   isPublic: false,
+  retentionHours: null,
   publicScope: {
     countries: [],
     minAge: null,
@@ -332,6 +358,7 @@ const createGroup = async () => {
       maxParticipants: form.value.maxParticipants,
       matchingType: form.value.matchingType,
       isPublic: form.value.isPublic,
+      retentionHours: form.value.retentionHours || null,
       publicScope: form.value.isPublic ? form.value.publicScope : null
     }
     

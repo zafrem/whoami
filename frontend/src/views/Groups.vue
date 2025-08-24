@@ -72,6 +72,21 @@
             <span class="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full">
               {{ group.matchingType }}
             </span>
+            <!-- Expiration Status Badge -->
+            <span v-if="isGroupExpired(group)" class="inline-flex items-center px-2 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
+              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Expired
+            </span>
+            <!-- Expiring Soon Badge -->
+            <span v-else-if="isGroupExpiringSoon(group)" class="inline-flex items-center px-2 py-1 bg-yellow-100 text-yellow-800 text-xs font-medium rounded-full">
+              <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              Expiring Soon
+            </span>
+            <!-- Public/Private Badge -->
             <span v-if="group.isPublic" class="inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded-full">
               <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -112,6 +127,23 @@
           <span>{{ group.currentParticipants }}/{{ group.maxParticipants }} members</span>
           <span>{{ formatDate(group.createdAt) }}</span>
         </div>
+        
+        <!-- Retention Time Info -->
+        <div v-if="group.retentionHours" class="text-sm mb-4">
+          <div class="flex items-center justify-between">
+            <span class="text-gray-600">Retention:</span>
+            <span :class="[
+              'font-medium',
+              isGroupExpired(group) ? 'text-red-600' : 
+              isGroupExpiringSoon(group) ? 'text-yellow-600' : 'text-green-600'
+            ]">
+              {{ getTimeUntilExpiration(group) || `${group.retentionHours}h total` }}
+            </span>
+          </div>
+          <div v-if="isGroupExpired(group)" class="text-xs text-red-600 mt-1">
+            🔒 Only visible to creator
+          </div>
+        </div>
 
         <div class="w-full bg-gray-200 rounded-full h-2 mb-4">
           <div 
@@ -122,11 +154,15 @@
 
         <button 
           v-if="authStore.isAuthenticated"
-          class="btn-primary w-full"
-          @click.stop="joinGroup(group)"
-          :disabled="group.currentParticipants >= group.maxParticipants"
+          class="w-full"
+          :class="isGroupExpired(group) ? 'btn-secondary' : 'btn-primary'"
+          @click.stop="isGroupExpired(group) ? viewGroup(group) : joinGroup(group)"
+          :disabled="!isGroupExpired(group) && group.currentParticipants >= group.maxParticipants"
         >
-          {{ group.currentParticipants >= group.maxParticipants ? 'Full' : 'Join Group' }}
+          {{ 
+            isGroupExpired(group) ? 'View Comments' :
+            group.currentParticipants >= group.maxParticipants ? 'Full' : 'Join Group' 
+          }}
         </button>
         <div v-else class="text-center text-gray-500 text-sm">
           Sign in to join
@@ -175,6 +211,40 @@ const selectedGroup = ref(null)
 
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString()
+}
+
+const isGroupExpired = (group) => {
+  if (!group.expiresAt) return false
+  return new Date() > new Date(group.expiresAt)
+}
+
+const isGroupExpiringSoon = (group) => {
+  if (!group.expiresAt || isGroupExpired(group)) return false
+  const expirationTime = new Date(group.expiresAt).getTime()
+  const currentTime = new Date().getTime()
+  const oneHourInMs = 60 * 60 * 1000
+  return (expirationTime - currentTime) <= oneHourInMs
+}
+
+const getTimeUntilExpiration = (group) => {
+  if (!group.expiresAt) return null
+  const expirationTime = new Date(group.expiresAt).getTime()
+  const currentTime = new Date().getTime()
+  const timeDiff = expirationTime - currentTime
+  
+  if (timeDiff <= 0) return 'Expired'
+  
+  const hours = Math.floor(timeDiff / (1000 * 60 * 60))
+  const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60))
+  
+  if (hours > 24) {
+    const days = Math.floor(hours / 24)
+    return `${days} day${days === 1 ? '' : 's'} left`
+  } else if (hours > 0) {
+    return `${hours}h ${minutes}m left`
+  } else {
+    return `${minutes}m left`
+  }
 }
 
 const fetchGroups = async () => {

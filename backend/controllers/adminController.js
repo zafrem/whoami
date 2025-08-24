@@ -61,24 +61,69 @@ const createSurvey = async (req, res) => {
       tags,
       baseId,
       externalUrl,
-      isExternal
+      isExternal,
+      isAdaptive,
+      adaptiveConfig
     } = req.body;
 
-    const survey = await Survey.create({
+    let surveyData = {
       name,
       description,
       category,
       language: language || 'en',
-      questionsJson,
-      analysisJson,
       estimatedTime,
       difficulty: difficulty || 'medium',
       tags: tags || [],
-      baseId,
       externalUrl,
       isExternal: isExternal || false,
       isActive: true
-    });
+    };
+
+    if (isAdaptive && adaptiveConfig) {
+      // For adaptive surveys, create a special baseId and surveyTypes configuration
+      const adaptiveBaseId = baseId || name.en.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      surveyData.baseId = adaptiveBaseId;
+      
+      // Fetch the selected surveys to get their questions and build surveyTypes config
+      const [simpleS, generalS, fullS] = await Promise.all([
+        Survey.findByPk(adaptiveConfig.simpleSurveyId),
+        Survey.findByPk(adaptiveConfig.generalSurveyId),
+        Survey.findByPk(adaptiveConfig.fullSurveyId)
+      ]);
+
+      if (!simpleS || !generalS || !fullS) {
+        return res.status(400).json({ error: 'One or more selected surveys not found' });
+      }
+
+      // Create consolidated questions from all three surveys and build surveyTypes config
+      const allQuestions = [
+        ...(simpleS.questionsJson || []).map(q => ({ ...q, priority: 1 })), // Simple priority
+        ...(generalS.questionsJson || []).filter(q => 
+          !(simpleS.questionsJson || []).find(sq => sq.id === q.id)
+        ).map(q => ({ ...q, priority: 2 })), // General priority
+        ...(fullS.questionsJson || []).filter(q => 
+          !(simpleS.questionsJson || []).find(sq => sq.id === q.id) &&
+          !(generalS.questionsJson || []).find(gq => gq.id === q.id)
+        ).map(q => ({ ...q, priority: 3 })) // Full priority
+      ];
+
+      surveyData.questionsJson = allQuestions;
+      surveyData.analysisJson = fullS.analysisJson || {}; // Use full survey's analysis
+      
+      // Create surveyTypes configuration
+      surveyData.surveyTypes = {
+        simple: { questions: simpleS.questionsJson?.length || 10, time: 3 },
+        general: { questions: generalS.questionsJson?.length || 20, time: 7 },
+        full: { questions: fullS.questionsJson?.length || 30, time: 10 }
+      };
+    } else {
+      // Regular survey
+      surveyData.baseId = baseId;
+      surveyData.questionsJson = questionsJson || {};
+      surveyData.analysisJson = analysisJson || {};
+    }
+
+    const survey = await Survey.create(surveyData);
 
     res.status(201).json({
       message: 'Survey created successfully',

@@ -101,11 +101,13 @@ const selectSurvey = (survey) => {
 }
 
 const loadSurveys = () => {
-  surveyStore.fetchSurveys({ active: 'true' })
+  // Use refresh for explicit retry actions
+  surveyStore.refreshSurveys({ active: 'true' })
 }
 
 onMounted(() => {
-  loadSurveys()
+  // Use cached fetch on mount
+  surveyStore.fetchSurveys({ active: 'true' })
 })
 </script>
 

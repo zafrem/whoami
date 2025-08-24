@@ -12,6 +12,10 @@ router.post('/', auth, groupController.createGroup);
 router.post('/:id/join', auth, groupController.joinGroup);
 router.delete('/:id/leave', auth, groupController.leaveGroup);
 router.delete('/:id', auth, groupController.deleteGroup);
+// Comments (for expired groups)
+router.get('/:id/comments', auth, groupController.getGroupComments);
+router.post('/:id/comments', auth, groupController.addGroupComment);
+router.delete('/comments/:commentId', auth, groupController.deleteGroupComment);
 // LLM-powered matching
 router.post('/:id/match', auth, groupController.performGroupMatching);
 router.get('/:id/matching-history', auth, groupController.getGroupMatchingHistory);

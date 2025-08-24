@@ -1,15 +1,20 @@
 # Whoami - Personality Survey Platform
 
-A multilingual personality assessment web application supporting MBTI, Political Compass, Big Five, and Investment Risk Tolerance surveys. Built with Vue.js 3 frontend and Vercel serverless functions with Neon PostgreSQL backend.
+A comprehensive multilingual personality assessment web application supporting MBTI, Political Compass, Big Five, and Investment Risk Tolerance surveys. Built with Vue.js 3 frontend and Vercel serverless functions with Neon PostgreSQL backend.
 
-## Features
+## ✨ Features
 
-- Multiple personality survey types with multilingual support (English/Korean)
-- User authentication and result history tracking
-- Progressive survey interface with real-time progress saving
-- Responsive design for desktop and mobile
-- Guest mode for anonymous survey taking
-- Result analytics and export functionality
+- **Multiple Survey Types**: MBTI, Political Compass, Big Five, Investment Risk Tolerance
+- **Multilingual Support**: Full support for English and Korean languages
+- **User Management**: Complete authentication system with profiles and result history
+- **Progressive Interface**: Real-time progress saving and intuitive survey experience
+- **Responsive Design**: Optimized for desktop, tablet, and mobile devices
+- **Guest Mode**: Anonymous survey taking without registration
+- **Analytics & Export**: Comprehensive result analytics and export functionality
+- **Group Management**: Create and manage survey groups for team assessments
+- **Admin Dashboard**: Full administrative interface for platform management
+- **LLM Integration**: AI-powered analysis and insights for survey results
+- **Comprehensive Testing**: Full unit test coverage for both backend APIs and frontend components
 
 ## Demo
 ![demo](./image/demo.gif)
@@ -104,12 +109,36 @@ RATE_LIMIT_WINDOW_MS=900000
 RATE_LIMIT_MAX=100
 ```
 
+#### Testing
+
+**Frontend Tests**
+```bash
+cd frontend
+npm test                      # Run all frontend unit tests
+npm run test:ui              # Run tests with UI
+npm run test:run             # Run tests once and exit
+```
+
+**Backend Tests**
+```bash
+cd backend
+npx jest                     # Run all backend API tests
+npx jest --watch             # Run tests in watch mode
+npx jest tests/api.simple.test.js  # Run specific test file
+```
+
+**Test Coverage**
+- Frontend: Comprehensive Vue component testing with Vitest
+- Backend: API endpoint testing with Jest and Supertest
+- Both test suites include mocking, error handling, and integration tests
+
 #### Troubleshooting
 
 - **CORS Errors**: Ensure `CORS_ORIGIN` in `backend/.env` matches your frontend URL
 - **WebSocket Errors**: The improved start scripts prevent most WebSocket frame errors
 - **Port Conflicts**: Use `./stop.sh --force` to kill processes on conflicting ports
 - **Database Issues**: Ensure PostgreSQL is running (start script handles this automatically)
+- **Test Database**: Backend tests require a test database configuration
 
 ---
 
@@ -123,4 +152,16 @@ RATE_LIMIT_MAX=100
 - Violet (What is my next aligned step?)
 
 
-For detailed documentation including API endpoints, configuration options, deployment guides, and development instructions, please visit the [Wiki](../../wiki).
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [SETUP.md](./SETUP.md) | Complete development environment setup guide |
+| [DEPLOYMENT.md](./DEPLOYMENT.md) | Production deployment with Vercel + Neon |
+| [DOCKER.md](./DOCKER.md) | Docker containerization and deployment |
+| [SYSTEM_REQUIREMENTS.md](./SYSTEM_REQUIREMENTS.md) | Hardware/software requirements and dependencies |
+| [API.md](./API.md) | Complete API documentation and endpoints |
+| [USER.md](./USER.md) | User guide and feature documentation |
+| [ADMIN.md](./ADMIN.md) | Administrative interface and management guide |
+
+For additional detailed documentation including configuration options and advanced guides, please visit the [Wiki](../../wiki).

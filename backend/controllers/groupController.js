@@ -1,11 +1,11 @@
-const { Group, User } = require('../models');
+const { Group, User, GroupComment } = require('../models');
 const { Op, col } = require('sequelize');
 const llmService = require('../services/llmService');
 
 const groupController = {
   async createGroup(req, res) {
     try {
-      const { name, description, maxParticipants, matchingType, isPublic, publicScope } = req.body;
+      const { name, description, maxParticipants, matchingType, isPublic, publicScope, retentionHours } = req.body;
       
       if (!name || !matchingType) {
         return res.status(400).json({
@@ -63,6 +63,13 @@ const groupController = {
         }
       }
       
+      // Validate retention hours if provided
+      if (retentionHours && (retentionHours < 1 || retentionHours > 336)) {
+        return res.status(400).json({
+          error: 'Retention hours must be between 1 and 336 (2 weeks maximum)'
+        });
+      }
+
       const group = await Group.create({
         name,
         description,
@@ -71,7 +78,8 @@ const groupController = {
         createdBy: req.user.id,
         currentParticipants: 1,
         isPublic: isPublic || false,
-        publicScope: validatedPublicScope
+        publicScope: validatedPublicScope,
+        retentionHours: retentionHours || null
       });
 
       await group.addMember(req.user.id);
@@ -87,6 +95,8 @@ const groupController = {
           matchingType: group.matchingType,
           isPublic: group.isPublic,
           publicScope: group.publicScope,
+          retentionHours: group.retentionHours,
+          expiresAt: group.expiresAt,
           createdAt: group.createdAt
         }
       });
@@ -132,15 +142,19 @@ const groupController = {
         attributes: [
           'id', 'name', 'description', 'maxParticipants', 
           'currentParticipants', 'matchingType', 'createdAt',
-          'isPublic', 'publicScope'
+          'isPublic', 'publicScope', 'retentionHours', 'expiresAt', 'createdBy'
         ],
         order: [['createdAt', 'DESC']],
         limit: parseInt(limit),
         offset: parseInt(offset)
       });
 
-      // Filter groups based on public scope criteria
+      // Filter groups based on retention time and user access, then by public scope
       const filteredGroups = groups.rows.filter(group => {
+        // First check if user can access this group based on retention time
+        if (!group.canUserAccess(req.user?.id)) {
+          return false;
+        }
         // Always show private groups
         if (!group.isPublic) {
           return true;
@@ -578,6 +592,117 @@ const groupController = {
       res.status(500).json({
         error: 'Failed to delete group'
       });
+    }
+  },
+
+  // Group Comments (for expired groups)
+  async getGroupComments(req, res) {
+    try {
+      const { id } = req.params;
+
+      const group = await Group.findByPk(id);
+      if (!group) {
+        return res.status(404).json({ error: 'Group not found' });
+      }
+
+      // Check if user can access this group
+      if (!group.canUserAccess(req.user.id)) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      const comments = await GroupComment.findAll({
+        where: { groupId: id, isVisible: true },
+        include: [{
+          model: User,
+          as: 'author',
+          attributes: ['id', 'username']
+        }],
+        order: [['createdAt', 'DESC']]
+      });
+
+      res.json({ comments });
+    } catch (error) {
+      console.error('Error fetching group comments:', error);
+      res.status(500).json({ error: 'Failed to fetch comments' });
+    }
+  },
+
+  async addGroupComment(req, res) {
+    try {
+      const { id } = req.params;
+      const { content } = req.body;
+
+      if (!content || content.trim().length === 0) {
+        return res.status(400).json({ error: 'Comment content is required' });
+      }
+
+      const group = await Group.findByPk(id);
+      if (!group) {
+        return res.status(404).json({ error: 'Group not found' });
+      }
+
+      // Check if user can access this group
+      if (!group.canUserAccess(req.user.id)) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      // Only allow comments on expired groups created by the user
+      if (!group.isExpired() || group.createdBy !== req.user.id) {
+        return res.status(403).json({ 
+          error: 'Comments can only be added to expired groups by their creator' 
+        });
+      }
+
+      const comment = await GroupComment.create({
+        groupId: id,
+        userId: req.user.id,
+        content: content.trim()
+      });
+
+      const commentWithAuthor = await GroupComment.findByPk(comment.id, {
+        include: [{
+          model: User,
+          as: 'author',
+          attributes: ['id', 'username']
+        }]
+      });
+
+      res.status(201).json({ 
+        message: 'Comment added successfully',
+        comment: commentWithAuthor 
+      });
+    } catch (error) {
+      console.error('Error adding group comment:', error);
+      res.status(500).json({ error: 'Failed to add comment' });
+    }
+  },
+
+  async deleteGroupComment(req, res) {
+    try {
+      const { commentId } = req.params;
+
+      const comment = await GroupComment.findByPk(commentId, {
+        include: [{
+          model: Group,
+          as: 'group'
+        }]
+      });
+
+      if (!comment) {
+        return res.status(404).json({ error: 'Comment not found' });
+      }
+
+      // Only the comment author or group creator can delete comments
+      if (comment.userId !== req.user.id && comment.group.createdBy !== req.user.id) {
+        return res.status(403).json({ error: 'Access denied' });
+      }
+
+      await comment.destroy();
+
+      res.json({ message: 'Comment deleted successfully' });
+    } catch (error) {
+      console.error('Error deleting group comment:', error);
+      res.status(500).json({ error: 'Failed to delete comment' });
     }
   }
 };

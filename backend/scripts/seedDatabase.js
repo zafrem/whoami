@@ -44,6 +44,9 @@ const seedSurveys = async () => {
         continue;
       }
 
+      // Determine if survey should be active (only Adaptive survey)
+      const isActive = baseId === 'test-adaptive';
+      
       // Create survey
       const survey = await Survey.create({
         name: surveyData.name,
@@ -56,7 +59,8 @@ const seedSurveys = async () => {
         estimatedTime: surveyData.estimatedTime,
         difficulty: surveyData.difficulty,
         tags: surveyData.tags,
-        isActive: true
+        surveyTypes: surveyData.surveyTypes,
+        isActive: isActive
       });
 
       console.log(`✅ Created survey: ${surveyName} (${surveyLanguage})`);

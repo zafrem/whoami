@@ -80,7 +80,7 @@
           v-for="survey in filteredSurveys"
           :key="survey.id"
           class="card hover:shadow-lg transition-shadow cursor-pointer"
-          @click="takeSurvey(survey)"
+          @click="selectSurvey(survey)"
         >
           <div class="mb-4">
             <div class="flex items-start justify-between mb-2">
@@ -128,6 +128,14 @@
         </div>
       </div>
     </div>
+    
+    <!-- Survey Type Selection Modal -->
+    <SurveyTypeModal
+      :show="showTypeModal"
+      :survey="selectedSurvey || {}"
+      @close="showTypeModal = false"
+      @select="onTypeSelected"
+    />
   </div>
 </template>
 
@@ -139,6 +147,7 @@ import {
   MagnifyingGlassIcon
 } from '@heroicons/vue/24/outline'
 import { useSurveyStore } from '@/stores/survey'
+import SurveyTypeModal from '@/components/SurveyTypeModal.vue'
 
 const router = useRouter()
 const surveyStore = useSurveyStore()
@@ -146,6 +155,8 @@ const surveyStore = useSurveyStore()
 const selectedCategory = ref('')
 const selectedDifficulty = ref('')
 const searchTerm = ref('')
+const showTypeModal = ref(false)
+const selectedSurvey = ref(null)
 
 const categories = computed(() => {
   const cats = [...new Set(surveyStore.surveys.map(s => s.category))]
@@ -176,7 +187,8 @@ const filteredSurveys = computed(() => {
 })
 
 const loadSurveys = () => {
-  surveyStore.fetchSurveys({ active: 'true' })
+  // Use refresh for explicit retry actions
+  surveyStore.refreshSurveys({ active: 'true' })
 }
 
 const applyFilters = () => {
@@ -189,8 +201,20 @@ const clearFilters = () => {
   searchTerm.value = ''
 }
 
-const takeSurvey = (survey) => {
-  router.push({ name: 'SurveyTake', params: { id: survey.id } })
+const selectSurvey = (survey) => {
+  // Check if survey has multiple types
+  if (survey.surveyTypes && Object.keys(survey.surveyTypes).length > 1) {
+    selectedSurvey.value = survey
+    showTypeModal.value = true
+  } else {
+    // Go directly to survey if no types or only one type
+    router.push({ name: 'SurveyTake', params: { id: survey.id } })
+  }
+}
+
+const onTypeSelected = (type) => {
+  showTypeModal.value = false
+  // Navigation is handled in the modal component
 }
 
 const getDifficultyClass = (difficulty) => {
@@ -203,7 +227,8 @@ const getDifficultyClass = (difficulty) => {
 }
 
 onMounted(() => {
-  loadSurveys()
+  // Use cached fetch on mount
+  surveyStore.fetchSurveys({ active: 'true' })
 })
 </script>
 

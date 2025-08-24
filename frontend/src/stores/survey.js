@@ -15,7 +15,9 @@ export const useSurveyStore = defineStore('survey', {
     results: null,
     userResults: [],
     loading: false,
-    error: null
+    error: null,
+    _activeSurveyRequest: null, // Cache for active survey request
+    _lastSurveyFetch: null // Timestamp of last successful fetch
   }),
 
   getters: {
@@ -33,22 +35,64 @@ export const useSurveyStore = defineStore('survey', {
   },
 
   actions: {
-    async fetchSurveys(params = {}) {
+    async fetchSurveys(params = {}, forceRefresh = false) {
+      // Create cache key from params
+      const cacheKey = JSON.stringify(params)
+      const now = Date.now()
+      
+      // Return cached data if recent (within 5 seconds) and not forcing refresh
+      if (!forceRefresh && 
+          this._lastSurveyFetch && 
+          (now - this._lastSurveyFetch) < 5000 && 
+          this.surveys.length > 0) {
+        return this.surveys
+      }
+
+      // If there's already an active request with the same params, wait for it
+      if (this._activeSurveyRequest && this._activeSurveyRequest.cacheKey === cacheKey) {
+        try {
+          return await this._activeSurveyRequest.promise
+        } catch (error) {
+          // If the cached request failed, continue with a new request
+        }
+      }
+
       this.loading = true
       this.error = null
 
+      // Create and cache the promise
+      const requestPromise = this._performSurveyRequest(params)
+      this._activeSurveyRequest = {
+        cacheKey,
+        promise: requestPromise
+      }
+
       try {
-        const response = await surveyAPI.getAll(params)
-        this.surveys = response.data
+        const result = await requestPromise
+        this._lastSurveyFetch = now
+        return result
       } catch (error) {
         this.error = error.response?.data?.error || 'Failed to fetch surveys'
         console.error('Fetch surveys error:', error)
+        throw error
       } finally {
         this.loading = false
+        this._activeSurveyRequest = null
       }
     },
 
+    async _performSurveyRequest(params) {
+      const response = await surveyAPI.getAll(params)
+      this.surveys = response.data
+      return response.data
+    },
+
     async fetchSurvey(id, includeQuestions = false) {
+      // If we already have this survey loaded, return it
+      if (this.currentSurvey && this.currentSurvey.id === id) {
+        return this.currentSurvey
+      }
+
       this.loading = true
       this.error = null
 
@@ -59,29 +103,34 @@ export const useSurveyStore = defineStore('survey', {
       } catch (error) {
         this.error = error.response?.data?.error || 'Failed to fetch survey'
         console.error('Fetch survey error:', error)
+        throw error
       } finally {
         this.loading = false
       }
     },
 
-    async fetchSurveyQuestions(id) {
+    async fetchSurveyQuestions(id, type = 'full') {
       this.loading = true
       this.error = null
 
       try {
-        const response = await surveyAPI.getQuestions(id)
+        const response = await surveyAPI.getQuestions(id, type)
         this.currentQuestions = response.data
         
-        const savedProgress = surveyStorage.getSurveyProgress(id)
+        // Create a unique key that includes survey type for progress storage
+        const progressKey = type === 'full' ? id : `${id}-${type}`
+        const savedProgress = surveyStorage.getSurveyProgress(progressKey)
+        
         if (savedProgress.startTime) {
           this.currentProgress = savedProgress
         } else {
           this.currentProgress = {
             currentQuestion: 0,
             answers: {},
-            startTime: new Date().toISOString()
+            startTime: new Date().toISOString(),
+            surveyType: type
           }
-          surveyStorage.setSurveyProgress(id, this.currentProgress)
+          surveyStorage.setSurveyProgress(progressKey, this.currentProgress)
         }
         
         return response.data
@@ -97,7 +146,9 @@ export const useSurveyStore = defineStore('survey', {
       this.currentProgress.answers[questionId] = answer
       
       if (this.currentSurvey) {
-        surveyStorage.setSurveyProgress(this.currentSurvey.id, this.currentProgress)
+        const surveyType = this.currentProgress.surveyType || 'full'
+        const progressKey = surveyType === 'full' ? this.currentSurvey.id : `${this.currentSurvey.id}-${surveyType}`
+        surveyStorage.setSurveyProgress(progressKey, this.currentProgress)
       }
     },
 
@@ -106,7 +157,9 @@ export const useSurveyStore = defineStore('survey', {
         this.currentProgress.currentQuestion++
         
         if (this.currentSurvey) {
-          surveyStorage.setSurveyProgress(this.currentSurvey.id, this.currentProgress)
+          const surveyType = this.currentProgress.surveyType || 'full'
+          const progressKey = surveyType === 'full' ? this.currentSurvey.id : `${this.currentSurvey.id}-${surveyType}`
+          surveyStorage.setSurveyProgress(progressKey, this.currentProgress)
         }
       }
     },
@@ -116,7 +169,9 @@ export const useSurveyStore = defineStore('survey', {
         this.currentProgress.currentQuestion--
         
         if (this.currentSurvey) {
-          surveyStorage.setSurveyProgress(this.currentSurvey.id, this.currentProgress)
+          const surveyType = this.currentProgress.surveyType || 'full'
+          const progressKey = surveyType === 'full' ? this.currentSurvey.id : `${this.currentSurvey.id}-${surveyType}`
+          surveyStorage.setSurveyProgress(progressKey, this.currentProgress)
         }
       }
     },
@@ -126,7 +181,9 @@ export const useSurveyStore = defineStore('survey', {
         this.currentProgress.currentQuestion = index
         
         if (this.currentSurvey) {
-          surveyStorage.setSurveyProgress(this.currentSurvey.id, this.currentProgress)
+          const surveyType = this.currentProgress.surveyType || 'full'
+          const progressKey = surveyType === 'full' ? this.currentSurvey.id : `${this.currentSurvey.id}-${surveyType}`
+          surveyStorage.setSurveyProgress(progressKey, this.currentProgress)
         }
       }
     },
@@ -146,7 +203,9 @@ export const useSurveyStore = defineStore('survey', {
         this.results = response.data
         
         if (this.currentSurvey) {
-          surveyStorage.removeSurveyProgress(this.currentSurvey.id)
+          const surveyType = this.currentProgress.surveyType || 'full'
+          const progressKey = surveyType === 'full' ? this.currentSurvey.id : `${this.currentSurvey.id}-${surveyType}`
+          surveyStorage.removeSurveyProgress(progressKey)
         }
         
         return response.data
@@ -241,6 +300,10 @@ export const useSurveyStore = defineStore('survey', {
       }
     },
 
+    async refreshSurveys(params = {}) {
+      return await this.fetchSurveys(params, true)
+    },
+
     resetCurrentSurvey() {
       this.currentSurvey = null
       this.currentQuestions = null
@@ -250,6 +313,17 @@ export const useSurveyStore = defineStore('survey', {
         startTime: null
       }
       this.results = null
+    },
+
+    resetAnswers() {
+      this.currentProgress.answers = {}
+      this.currentProgress.currentQuestion = 0
+      
+      if (this.currentSurvey) {
+        const surveyType = this.currentProgress.surveyType || 'full'
+        const progressKey = surveyType === 'full' ? this.currentSurvey.id : `${this.currentSurvey.id}-${surveyType}`
+        surveyStorage.setSurveyProgress(progressKey, this.currentProgress)
+      }
     },
 
     clearError() {

@@ -17,7 +17,7 @@ A comprehensive multilingual personality assessment web application supporting M
 - **Comprehensive Testing**: Full unit test coverage for both backend APIs and frontend components
 
 ## Demo
-![demo](./image/demo.gif)
+![demo](./image/Who-am-I.gif)
 
 ## How to Run
 

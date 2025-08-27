@@ -1,7 +1,12 @@
 <template>
   <aside class="fixed left-0 top-16 w-64 h-[calc(100vh-4rem)] bg-white border-r border-gray-200 overflow-y-auto">
     <div class="p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Available Surveys</h2>
+      <router-link 
+        to="/surveys" 
+        class="block text-lg font-semibold text-gray-900 hover:text-primary-600 mb-4 transition-colors cursor-pointer"
+      >
+        Available Surveys
+      </router-link>
       
       <div v-if="surveyStore.loading" class="space-y-3">
         <div v-for="n in 3" :key="n" class="animate-pulse">

@@ -222,6 +222,7 @@
     "loading": "Loading survey...",
     "progress": "Progress",
     "question": "Question {current} of {total}",
+    "questionCount": "{current} of {total}",
     "timeSpent": "Time spent: {time}",
     "previousQuestion": "Previous",
     "nextQuestion": "Next",

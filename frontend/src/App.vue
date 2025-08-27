@@ -57,5 +57,6 @@ onMounted(() => {
   if (authStore.isAuthenticated && !authStore.user) {
     authStore.fetchProfile()
   }
+  
 })
 </script>

@@ -219,6 +219,7 @@
   "survey": {
     "progress": "진행률",
     "question": "질문 {current} / {total}",
+    "questionCount": "{current} / {total}",
     "timeSpent": "소요 시간: {time}",
     "previousQuestion": "이전",
     "nextQuestion": "다음",

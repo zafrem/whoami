@@ -21,19 +21,6 @@ A comprehensive multilingual personality assessment web application supporting M
 
 ## How to Run
 
-### Production Deployment
-
-1. **Deploy to Vercel**: Connect your GitHub repository to Vercel
-2. **Create Neon Database**: Get a free PostgreSQL database at [neon.tech](https://neon.tech)
-3. **Configure Environment Variables**:
-   ```env
-   DATABASE_URL=postgresql://username:password@hostname/database
-   JWT_SECRET=your_64_character_random_jwt_secret_key_here
-   ```
-4. **Initialize Database**: Visit `/api/migrate-db` endpoint once after deployment
-
-### Local Development
-
 #### Quick Start
 
 ```bash
